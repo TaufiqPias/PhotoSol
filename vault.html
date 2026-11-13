@@ -22,7 +22,7 @@ const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then
 (async()=>{try{
   const r=await(await fetch(API_URL+'?id='+encodeURIComponent(id))).json();if(!r.ok)throw 0;const o=r.order;
   const kv=(k,v)=>v?`<div class="kv"><span>${k}</span><span>${esc(v)}</span></div>`:'';
-  $('info').innerHTML=`<h1>Work Order ${esc(o.wo)}</h1>`+kv('Address',o.address)+kv('Due Date',o.due)+kv('LockBox',o.lock)+kv('Key Code',o.code)+kv('Payment',o.pay)+
+  $('info').innerHTML=`<h1>Work Order ${esc(o.wo)}</h1>`+kv('Address',o.address)+kv('Work Order Type',o.type)+kv('Due Date',o.due)+kv('Contractor',o.contractor)+(o.phone?`<div class="kv"><span>Support Phone</span><a href="tel:${esc(o.phone.replace(/[^0-9+]/g,''))}">${esc(o.phone)}</a></div>`:'')+kv('LockBox',o.lock)+kv('Key Code',o.code)+kv('Payment',o.pay)+
    (o.instr?`<details style="margin-top:10px"><summary>Work order instructions</summary><pre>${esc(o.instr)}</pre></details>`:'');
   $('act').hidden=false;
 }catch(e){$('info').textContent='This vault link is invalid.';}})();
