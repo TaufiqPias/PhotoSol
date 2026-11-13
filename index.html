@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Photo Vault – Admin</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
+<div class="card"><h1>Create Photo Vault</h1>
+<label>Admin key</label><input id="key" type="password" placeholder="Your ADMIN_KEY">
+<label>Work Order Number *</label><input id="wo">
+<label>Property Address *</label><input id="address">
+<label>Due Date</label><input id="due" type="date">
+<div class="row"><div><label>LockBox Number (optional)</label><input id="lock"></div><div><label>Key Code (optional)</label><input id="code"></div></div>
+<label>Work Order Instructions</label><textarea id="instr" rows="5"></textarea>
+<label>Payment</label><input id="pay" placeholder="e.g. $85">
+<button id="go">Create Photo Vault</button><div class="msg" id="msg"></div></div>
+<div id="list"></div></div>
+<script src="config.js"></script><script>
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('key').value=localStorage.pvKey||'';
+let vaults=JSON.parse(localStorage.pvList||'[]');
+function render(){$('list').innerHTML=vaults.map((v,i)=>`<div class="card"><b>📁 ${esc(v.name)}</b><div class="link">${esc(v.link)}</div>
+<div class="row"><button class="sec" onclick="copyL(${i})">Copy link</button><button class="sec" onclick="window.open(vaults[${i}].drive)">Open Drive folder</button></div></div>`).join('');}
+function copyL(i){navigator.clipboard.writeText(vaults[i].link);$('msg').textContent='Link copied.';}
+$('go').onclick=async()=>{
+  const o={wo:$('wo').value.trim(),address:$('address').value.trim(),due:$('due').value,lock:$('lock').value.trim(),code:$('code').value.trim(),instr:$('instr').value.trim(),pay:$('pay').value.trim()};
+  if(!o.wo||!o.address){$('msg').textContent='Work order number and address are required.';return;}
+  localStorage.pvKey=$('key').value;$('go').disabled=true;$('msg').textContent='Creating…';
+  try{const r=await(await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'create',key:$('key').value,order:o})})).json();
+    if(!r.ok)throw new Error(r.error);
+    vaults.unshift({name:r.name,link:new URL('vault.html?id='+r.id,location.href).href,drive:r.url});
+    localStorage.pvList=JSON.stringify(vaults);render();$('msg').textContent='Vault created ✔';
+  }catch(e){$('msg').textContent='Error: '+e.message;}
+  $('go').disabled=false;};
+render();
+</script></body></html>

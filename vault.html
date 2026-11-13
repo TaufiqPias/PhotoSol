@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Photo Vault</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
+<div class="card" id="info">Loading…</div>
+<div class="card" id="act" hidden>
+<div class="row"><button id="cam">📷 Take Photos</button><button id="up" class="sec">🖼 Upload Photos</button></div>
+<input id="fc" type="file" accept="image/*" capture="environment" hidden>
+<input id="fu" type="file" accept="image/*" multiple hidden>
+<div class="msg" id="count">No photos yet.</div><div class="thumbs" id="th"></div>
+<div class="bar" id="bar" hidden><i></i></div>
+<button id="sub" disabled>Submit Photos</button>
+<button id="fin" class="ok" hidden>Submit Order</button><div class="msg" id="msg"></div></div></div>
+<script src="config.js"></script><script>
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const id=new URLSearchParams(location.search).get('id');let files=[],done=0;
+const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then(r=>r.json());
+(async()=>{try{
+  const r=await(await fetch(API_URL+'?id='+encodeURIComponent(id))).json();if(!r.ok)throw 0;const o=r.order;
+  const kv=(k,v)=>v?`<div class="kv"><span>${k}</span><span>${esc(v)}</span></div>`:'';
+  $('info').innerHTML=`<h1>Work Order ${esc(o.wo)}</h1>`+kv('Address',o.address)+kv('Due Date',o.due)+kv('LockBox',o.lock)+kv('Key Code',o.code)+kv('Payment',o.pay)+
+   (o.instr?`<details style="margin-top:10px"><summary>Work order instructions</summary><pre>${esc(o.instr)}</pre></details>`:'');
+  $('act').hidden=false;
+}catch(e){$('info').textContent='This vault link is invalid.';}})();
+$('cam').onclick=()=>$('fc').click();$('up').onclick=()=>$('fu').click();
+function add(e){for(const f of e.target.files){files.push(f);const i=new Image();i.src=URL.createObjectURL(f);$('th').appendChild(i);}
+  e.target.value='';$('count').textContent=files.length+' photo(s) ready';$('sub').disabled=!files.length;$('fin').hidden=true;}
+$('fc').onchange=add;$('fu').onchange=add;
+async function shrink(f){const b=await createImageBitmap(f),s=Math.min(1,1800/Math.max(b.width,b.height));
+  const c=document.createElement('canvas');c.width=b.width*s;c.height=b.height*s;c.getContext('2d').drawImage(b,0,0,c.width,c.height);
+  const d=c.toDataURL('image/jpeg',.85);return d.split(',')[1];}
+$('sub').onclick=async()=>{$('sub').disabled=$('cam').disabled=$('up').disabled=true;$('bar').hidden=false;$('msg').textContent='';
+  const total=files.length+done;
+  while(files.length){const f=files[0];
+    try{const r=await post({action:'upload',name:Date.now()+'_'+(done+1)+'.jpg',type:'image/jpeg',data:await shrink(f)});if(!r.ok)throw new Error(r.error);
+      files.shift();done++;$('bar').firstChild.style.width=(done/total*100)+'%';$('count').textContent=`Uploaded ${done} of ${total}`;
+    }catch(e){$('msg').textContent='Upload interrupted ('+e.message+'). Tap Submit Photos to retry.';$('sub').disabled=$('cam').disabled=$('up').disabled=false;return;}}
+  $('th').innerHTML='';$('msg').textContent='All photos uploaded ✔';$('fin').hidden=false;$('cam').disabled=$('up').disabled=false;};
+$('fin').onclick=async()=>{$('fin').disabled=true;try{const r=await post({action:'submit'});if(!r.ok)throw new Error(r.error);
+  $('act').innerHTML='<h1>✔ Order submitted</h1><p>Thank you! The office has been notified.</p>';}
+  catch(e){$('msg').textContent='Error: '+e.message;$('fin').disabled=false;}};
+</script></body></html>
