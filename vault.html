@@ -54,10 +54,18 @@ const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then
   ORD=o;INS=ins;$('act').hidden=false;
 }catch(e){$('info').textContent='This vault link is invalid.';}})();
 
-const sc=(w,h)=>Math.min(1,640/Math.max(w,h),480/Math.min(w,h));
+const sc=(w,h)=>Math.min(800/Math.max(w,h),600/Math.min(w,h));
+const toB=(c,q)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
+async function dens(b){try{const a=new Uint8Array(await b.arrayBuffer());
+  if(a[0]===255&&a[1]===216&&a[2]===255&&a[3]===224&&a[6]===74&&a[7]===70){a[13]=1;a[14]=1;a[15]=44;a[16]=1;a[17]=44;return new Blob([a],{type:'image/jpeg'});}}catch(_){}return b;}
+async function enc(c){const LO=200000,HI=350000;let lo=.5,hi=.98,q=.9,best=null;
+  for(let i=0;i<6;i++){const b=await toB(c,q);if(!b)break;
+    const d=b.size<LO?LO-b.size:b.size>HI?b.size-HI:0;if(!best||d<best.d)best={b,d};
+    if(!d)break;if(b.size>HI)hi=q;else lo=q;q=(lo+hi)/2;}
+  if(!best)throw new Error('Encode failed');return dens(best.b);}
 async function prep(f){const b=await createImageBitmap(f),s=sc(b.width,b.height),c=document.createElement('canvas');
-  c.width=Math.round(b.width*s);c.height=Math.round(b.height*s);c.getContext('2d').drawImage(b,0,0,c.width,c.height);
-  return new Promise(r=>c.toBlob(r,'image/jpeg',.85));}
+  c.width=Math.round(b.width*s);c.height=Math.round(b.height*s);const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(b,0,0,c.width,c.height);
+  return enc(c);}
 function rowH(x){const bar=x.s==='pend'?'':`<div class="pb"><i class="${x.s==='done'?'g':''}" style="width:${x.p}%"></i></div>`;
   const st=x.s==='done'?'<span class="tick">✔</span>':x.s==='up'?x.p+'%':x.s==='err'?'<span class="er">Failed</span>':'';
   const rm=(x.s==='pend'||x.s==='err')?`<button class="ib" onclick="rmv(${x.id})" aria-label="Remove photo">✕</button>`:'';
@@ -78,14 +86,14 @@ $('fu').onchange=async e=>{const fs=[...e.target.files];e.target.value='';for(co
 let stream,track,torch=false,taken=0;
 function chkTorch(){const c=track&&track.getCapabilities?track.getCapabilities():{};$('flash').hidden=!c.torch;}
 $('cam').onclick=async()=>{try{
-  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:640},height:{ideal:480}},audio:false});
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1600},height:{ideal:1200}},audio:false});
   track=stream.getVideoTracks()[0];torch=false;$('flash').classList.remove('on');chkTorch();$('vid').onplaying=chkTorch;$('vid').srcObject=stream;$('cv').hidden=false;try{$('cv').requestFullscreen&&$('cv').requestFullscreen().catch(()=>{});}catch(_){}taken=0;$('cvn').textContent='0 taken';
 }catch(e){$('msg').textContent='Camera unavailable: '+e.message;}};
 $('flash').onclick=async()=>{try{torch=!torch;await track.applyConstraints({advanced:[{torch}]});$('flash').classList.toggle('on',torch);}
   catch(e){torch=false;$('flash').classList.remove('on');$('flash').hidden=true;}};
 $('shut').onclick=()=>{navigator.vibrate&&navigator.vibrate(25);const v=$('vid');if(!v.videoWidth)return;const s=sc(v.videoWidth,v.videoHeight),c=document.createElement('canvas');
-  c.width=Math.round(v.videoWidth*s);c.height=Math.round(v.videoHeight*s);c.getContext('2d').drawImage(v,0,0,c.width,c.height);
-  c.toBlob(b=>{if(b){addBlob(b);$('cvn').textContent=(++taken)+' taken';}},'image/jpeg',.8);
+  c.width=Math.round(v.videoWidth*s);c.height=Math.round(v.videoHeight*s);const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(v,0,0,c.width,c.height);
+  $('cvn').textContent=(++taken)+' taken';enc(c).then(addBlob).catch(()=>{});
   v.style.opacity=.3;setTimeout(()=>v.style.opacity=1,80);};
 $('cvdone').onclick=()=>{try{document.fullscreenElement&&document.exitFullscreen();}catch(_){}stream&&stream.getTracks().forEach(t=>t.stop());$('cv').hidden=true;};
 
