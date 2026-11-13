@@ -1,14 +1,18 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PhotoSol – Admin</title><link rel="stylesheet" href="style.css">
 <style>
-.wrap{max-width:1100px}
-.top{display:flex;align-items:baseline;gap:14px;margin:4px 0 18px;flex-wrap:wrap}
+.wrap{max-width:1200px}
+.top{display:flex;align-items:center;gap:14px;margin:4px 0 18px;flex-wrap:wrap}
 .logo{font:800 2rem/1 system-ui,sans-serif;letter-spacing:-1.5px}.logo span{color:var(--pri);font-weight:300;letter-spacing:-1px}
-.tag{color:var(--mut);font-size:.9rem}
-.grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:900px){.grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}#side{position:sticky;top:16px}body{padding:24px}}
+.co{color:var(--mut);font-size:1.05rem;font-weight:600;border-left:2px solid var(--bd);padding-left:14px}
+@media(min-width:900px){body{padding:24px}}
 .fg{display:grid;grid-template-columns:1fr;gap:0 14px}.full{grid-column:1/-1}
-@media(min-width:600px){.fg{grid-template-columns:1fr 1fr}}
+@media(min-width:600px){.fg{grid-template-columns:repeat(2,1fr)}.s2{grid-column:span 2}}
+@media(min-width:1000px){.fg{grid-template-columns:repeat(4,1fr)}}
+#ins{display:grid;grid-template-columns:1fr;gap:0 14px}@media(min-width:900px){#ins{grid-template-columns:1fr 1fr}}
+.act{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-direction:column;margin-top:6px}.act button,.act .msg{margin:0}
+@media(min-width:700px){.act{flex-direction:row}.act button{width:auto;padding:13px 34px}}
+#list{display:grid;grid-template-columns:1fr;column-gap:28px}@media(min-width:900px){#list{grid-template-columns:1fr 1fr}}
 .ins{position:relative;margin-bottom:8px}.ins .x{position:absolute;right:6px;top:6px}
 button.add{background:transparent;color:var(--pri);border:1px dashed var(--pri);padding:9px;font-size:.9rem}
 button.ib{width:34px;height:34px;padding:0;margin:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;color:var(--pri);border:1px solid var(--bd);border-radius:8px;flex:none}
@@ -22,28 +26,25 @@ input[type=checkbox]{width:18px;height:18px;padding:0;flex:none}
 .empty{color:var(--mut);font-size:.9rem;padding:10px 0}
 footer{text-align:center;color:var(--mut);font-size:.85rem;margin:20px 0 6px}
 </style></head><body><div class="wrap">
-<header class="top"><div class="logo">Photo<span>Sol</span></div><div class="tag">Contractor photo vaults</div></header>
-<div class="grid">
+<header class="top"><div class="logo">Photo<span>Sol</span></div><div class="co">Kingson Transport LLC</div></header>
 <div class="card"><h1>Create Photo Vault</h1>
 <div class="fg">
-<div class="full"><label>Admin key</label><input id="key" type="password" placeholder="Your ADMIN_KEY"></div>
+<div><label>Admin key</label><input id="key" type="password" placeholder="Your ADMIN_KEY"></div>
 <div><label>Work Order Number *</label><input id="wo"></div>
-<div><label>Work Order Type</label><input id="type" placeholder="e.g. Lawn cut, Debris removal"></div>
-<div class="full"><label>Property Address *</label><input id="address"></div>
+<div><label>Work Order Type</label><input id="type" placeholder="e.g. Lawn cut"></div>
+<div><label>Due Date</label><input id="due" type="date"></div>
+<div class="s2"><label>Property Address *</label><input id="address"></div>
 <div><label>Contractor Name</label><input id="contractor"></div>
 <div><label>Support Phone</label><input id="phone" type="tel"></div>
-<div><label>Due Date</label><input id="due" type="date"></div>
-<div><label>Payment</label><input id="pay" placeholder="e.g. $85"></div>
 <div><label>LockBox Number (optional)</label><input id="lock"></div>
 <div><label>Key Code (optional)</label><input id="code"></div>
-<div class="full"><label>Work Order Instructions</label><div id="ins"></div>
-<button type="button" class="add" id="addins">+ Add Another Instruction</button></div>
+<div class="s2"><label>Payment</label><input id="pay" placeholder="e.g. $85"></div>
+<div class="full"><label>Work Order Instructions</label><div id="ins"></div><button type="button" class="add" id="addins">+ Add Another Instruction</button></div>
 </div>
-<button id="go">Create Photo Vault</button><div class="msg" id="msg"></div></div>
+<div class="act"><div class="msg" id="msg"></div><button id="go">Create Photo Vault</button></div></div>
 <div class="card" id="side"><h1>Vaults (<span id="cnt">0</span>)</h1>
 <div class="tb"><label><input type="checkbox" id="all"> Select all</label><button id="bulk" disabled>Remove selected (0)</button></div>
 <div id="list"></div></div>
-</div>
 <footer>Developed by Taufiq Pias</footer></div>
 <script src="config.js"></script><script>
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -76,7 +77,7 @@ function copyL(i){navigator.clipboard.writeText(vaults[i].link);$('msg').textCon
 $('go').onclick=async()=>{
   const parts=[...document.querySelectorAll('#ins textarea')].map(t=>t.value.trim()).filter(Boolean);
   const instr=parts.length>1?parts.map((t,i)=>(i+1)+'. '+t).join('\n\n'):(parts[0]||'');
-  const o={wo:$('wo').value.trim(),type:$('type').value.trim(),contractor:$('contractor').value.trim(),phone:$('phone').value.trim(),address:$('address').value.trim(),due:$('due').value,lock:$('lock').value.trim(),code:$('code').value.trim(),instr,pay:$('pay').value.trim()};
+  const o={wo:$('wo').value.trim(),type:$('type').value.trim(),contractor:$('contractor').value.trim(),phone:$('phone').value.trim(),address:$('address').value.trim(),due:$('due').value,lock:$('lock').value.trim(),code:$('code').value.trim(),instr,instrs:parts,pay:$('pay').value.trim()};
   if(!o.wo||!o.address){$('msg').textContent='Work order number and address are required.';return;}
   localStorage.pvKey=$('key').value;$('go').disabled=true;$('msg').textContent='Creating…';
   try{const r=await(await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'create',key:$('key').value,order:o})})).json();
