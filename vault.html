@@ -31,6 +31,7 @@ button.ib{width:30px;height:30px;margin:0;padding:0;flex:none;background:transpa
 <div class="card" id="act" hidden>
 <div class="row" id="cr"><button id="cam">Take Photos</button><button id="up" class="sec">Upload Photos</button></div>
 <input id="fu" type="file" accept="image/*" multiple hidden>
+<div class="msg" id="gps"></div>
 <div class="msg" id="count">No photos yet.</div>
 <div id="pl"></div><button id="more" class="sec" hidden></button>
 <button id="sub" disabled>Submit Photos</button>
@@ -52,7 +53,7 @@ const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then
   $('info').innerHTML=`<h1>Work Order ${esc(o.wo)}</h1>`+kv('Address',o.address)+kv('Work Order Type',o.type)+kv('Due Date',o.due)+kv('Contractor',o.contractor)+
    (o.phone?`<div class="kv"><span>Support Phone</span><a href="tel:${esc(o.phone.replace(/[^0-9+]/g,''))}">${esc(o.phone)}</a></div>`:'')+kv('LockBox',o.lock)+kv('Key Code',o.code)+kv('Payment',o.pay)+
    (ins.length?`<details style="margin-top:10px"><summary>Work order instructions</summary>${ins.map((t,i)=>`<div class="ii"><pre>${ins.length>1?(i+1)+'. ':''}${esc(t)}</pre></div>`).join('')}</details>`:'');
-  ORD=o;INS=ins;$('act').hidden=false;
+  ORD=o;INS=ins;$('act').hidden=false;gStart();cvTxt();
 }catch(e){$('info').textContent='This vault link is invalid.';}})();
 
 const sc=(w,h)=>Math.min(800/Math.max(w,h),600/Math.min(w,h));
@@ -113,28 +114,31 @@ $('more').onclick=()=>{vis=items.length-vis>0?vis+10:5;render();};
 function addBlob(b,m){items.push({id:++seq,meta:m,b,u:URL.createObjectURL(b),s:'pend',p:0});render();}
 function rmv(n){const k=items.findIndex(x=>x.id===n);if(k<0)return;URL.revokeObjectURL(items[k].u);items.splice(k,1);render();}
 $('up').onclick=()=>$('fu').click();
-$('fu').onchange=async e=>{const fs=[...e.target.files];e.target.value='';const p=await getPos();
+$('fu').onchange=async e=>{const fs=[...e.target.files];e.target.value='';$('msg').textContent='';const p=await getPos();if(!p){gMsg();$('msg').textContent='Photos not added. '+$('msg').textContent;return;}
   for(const f of fs){try{const m=mkMeta(new Date(f.lastModified||Date.now()),p,'gallery');addBlob(await prep(f,m),m);}catch(_){}}};
 
 let stream,track,torch=false,taken=0;
 function chkTorch(){const c=track&&track.getCapabilities?track.getCapabilities():{};$('flash').hidden=!c.torch;}
-let pos=null,gw=null;
-function cvTxt(){$('cvn').textContent=taken+' taken · '+(pos?'GPS ✔':'GPS off');}
+let pos=null,gw=null,denied=false;
+function cvTxt(){$('gps').textContent=pos?'Location ✔ ready':denied?'Location is blocked':'Location: waiting for GPS…';
+  $('cvn').textContent=taken+' taken · '+(pos?'GPS ✔':'GPS off');$('shut').disabled=!pos;}
 function gStart(){if(!navigator.geolocation||gw!=null)return;
-  gw=navigator.geolocation.watchPosition(p=>{pos=p;cvTxt();},()=>cvTxt(),{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}
+  gw=navigator.geolocation.watchPosition(p=>{pos=p;denied=false;cvTxt();},e=>{if(e.code===1){pos=null;denied=true;}cvTxt();},{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}
 function gStop(){if(gw!=null&&navigator.geolocation)navigator.geolocation.clearWatch(gw);gw=null;}
-const getPos=()=>pos&&Date.now()-pos.timestamp<120000?Promise.resolve(pos):new Promise(r=>navigator.geolocation?navigator.geolocation.getCurrentPosition(r,()=>r(null),{enableHighAccuracy:true,timeout:8000,maximumAge:60000}):r(null));
+const getPos=()=>pos?Promise.resolve(pos):new Promise(r=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>{pos=p;denied=false;r(p);},e=>{if(e.code===1)denied=true;r(null);},{enableHighAccuracy:true,timeout:15000,maximumAge:60000}):r(null));
+function gMsg(){$('msg').textContent=denied?'Location is blocked. Allow location for this page (tap the lock icon in the address bar → Permissions → Location → Allow), then try again.':'Location is required. Turn on Location / GPS on your phone, allow it for this page, then try again.';}
 function closeCam(){try{document.fullscreenElement&&document.exitFullscreen();}catch(_){}
-  stream&&stream.getTracks().forEach(t=>t.stop());stream=null;gStop();$('cv').hidden=true;}
-$('cam').onclick=async()=>{const cv=$('cv');cv.hidden=false;taken=0;cvTxt();
+  stream&&stream.getTracks().forEach(t=>t.stop());stream=null;$('cv').hidden=true;}
+$('cam').onclick=async()=>{
+  if(!pos){$('msg').textContent='Getting your location…';gStop();gStart();await getPos();if(!pos){gMsg();cvTxt();return;}$('msg').textContent='';}
+  const cv=$('cv');cv.hidden=false;taken=0;cvTxt();
   try{const r=(cv.requestFullscreen||cv.webkitRequestFullscreen||(()=>0)).call(cv);r&&r.catch&&r.catch(()=>{});}catch(_){}
-  gStart();
   try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1600},height:{ideal:1200}},audio:false});
     track=stream.getVideoTracks()[0];torch=false;$('flash').classList.remove('on');chkTorch();$('vid').onplaying=chkTorch;$('vid').srcObject=stream;
   }catch(e){closeCam();$('msg').textContent='Camera unavailable: '+e.message;}};
 $('flash').onclick=async()=>{try{torch=!torch;await track.applyConstraints({advanced:[{torch}]});$('flash').classList.toggle('on',torch);}
   catch(e){torch=false;$('flash').classList.remove('on');$('flash').hidden=true;}};
-$('shut').onclick=()=>{navigator.vibrate&&navigator.vibrate(25);const v=$('vid');if(!v.videoWidth)return;const s=sc(v.videoWidth,v.videoHeight),c=document.createElement('canvas');
+$('shut').onclick=()=>{if(!pos)return;navigator.vibrate&&navigator.vibrate(25);const v=$('vid');if(!v.videoWidth)return;const s=sc(v.videoWidth,v.videoHeight),c=document.createElement('canvas');
   c.width=Math.round(v.videoWidth*s);c.height=Math.round(v.videoHeight*s);const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(v,0,0,c.width,c.height);
   const m=mkMeta(new Date(),pos,'camera');taken++;cvTxt();enc(c,m).then(b=>addBlob(b,m)).catch(()=>{});
   v.style.opacity=.3;setTimeout(()=>v.style.opacity=1,80);};
@@ -188,6 +192,6 @@ $('rcpt').onclick=async()=>{const b=$('rcpt');b.disabled=true;b.textContent='Pre
   }catch(e){$('msg').textContent='Could not create receipt: '+e.message;}
   b.disabled=false;b.textContent='Download Receipt';};
 $('fin').onclick=async()=>{$('fin').disabled=true;try{const r=await post({action:'submit'});if(!r.ok)throw new Error(r.error);
-  when=new Date().toLocaleString();['cr','sub','fin','more','pl','count'].forEach(k=>$(k).hidden=true);$('thanks').hidden=false;$('msg').textContent='';}
+  gStop();when=new Date().toLocaleString();['cr','sub','fin','more','pl','count'].forEach(k=>$(k).hidden=true);$('thanks').hidden=false;$('msg').textContent='';}
   catch(e){$('msg').textContent='Error: '+e.message;$('fin').disabled=false;}};
 </script></body></html>
