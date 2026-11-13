@@ -59,6 +59,7 @@ const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then
 const sc=(w,h)=>Math.min(800/Math.max(w,h),600/Math.min(w,h));
 const toB=(c,q)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
 const pad=n=>String(n).padStart(2,'0');
+const fmt=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 const mkMeta=(t,p,src)=>({t,src,lat:p?p.coords.latitude:null,lon:p?p.coords.longitude:null,acc:p?Math.round(p.coords.accuracy):null});
 function descOf(m){if(!m)return'';const d=m.t,z=-d.getTimezoneOffset();
   let s=`Taken: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} (UTC${z<0?'-':'+'}${pad(Math.floor(Math.abs(z)/60))}:${pad(Math.abs(z)%60)})`;
@@ -174,11 +175,13 @@ function buildReceipt(J,o,ins,th,when){
     ins.forEach((t,i)=>{for(const l of doc.splitTextToSize((ins.length>1?(i+1)+'. ':'')+t,W-2*M)){chk(5);doc.text(l,M,y);y+=4.8;}
       if(i<ins.length-1){y+=1.5;chk(4);doc.setDrawColor(210);doc.line(M,y,W-M,y);y+=5;}});}
   y+=8;chk(30);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(26,34,48);doc.text('Uploaded Photos ('+th.length+')',M,y);y+=6;
-  const cols=4,gap=3,cw=(W-2*M-gap*(cols-1))/cols,ch=cw*.75;let ry=y;
-  th.forEach((t,i)=>{const c=i%cols;if(c===0){chk(ch+gap);ry=y;}
-    const s=Math.min(cw/t.w,ch/t.h),w=t.w*s,h=t.h*s;
-    doc.addImage(t.d,'JPEG',M+c*(cw+gap)+(cw-w)/2,ry+(ch-h)/2,w,h);
-    if(c===cols-1||i===th.length-1)y=ry+ch+gap;});
+  const cols=4,gap=4,cw=(W-2*M-gap*(cols-1))/cols,ch=cw*.75,lh=10;let ry=y;
+  th.forEach((t,i)=>{const c=i%cols;if(c===0){chk(ch+lh+gap);ry=y;}
+    const k=Math.min(cw/t.w,ch/t.h),w=t.w*k,h=t.h*k,x=M+c*(cw+gap);
+    doc.addImage(t.d,'JPEG',x,ry,w,h);
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(26,34,48);doc.text(String(t.name),x,ry+ch+3.6);
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(110);doc.text(String(t.when||''),x,ry+ch+7);
+    if(c===cols-1||i===th.length-1)y=ry+ch+lh+gap;});
   const n=doc.getNumberOfPages();doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(140);
   for(let p=1;p<=n;p++){doc.setPage(p);doc.text('Page '+p+' of '+n,W/2,H-8,{align:'center'});}
   return doc;}
@@ -187,7 +190,7 @@ async function thumb(b){const bm=await createImageBitmap(b),s=Math.min(1,240/Mat
   c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
   return{d:c.toDataURL('image/jpeg',.7),w:c.width,h:c.height};}
 $('rcpt').onclick=async()=>{const b=$('rcpt');b.disabled=true;b.textContent='Preparing receipt…';
-  try{const th=[];for(const x of items.filter(x=>x.s==='done'))th.push(await thumb(x.b));
+  try{const th=[];for(const x of items.filter(x=>x.s==='done'))th.push({...await thumb(x.b),name:x.n||'Photo '+x.id,when:x.meta?fmt(x.meta.t):''});
     buildReceipt(window.jspdf.jsPDF,ORD,INS,th,when||new Date().toLocaleString()).save('Receipt_WO-'+String(ORD.wo).replace(/[^\w-]+/g,'_')+'.pdf');
   }catch(e){$('msg').textContent='Could not create receipt: '+e.message;}
   b.disabled=false;b.textContent='Download Receipt';};
