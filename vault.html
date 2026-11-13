@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <title>Photo Vault</title><link rel="stylesheet" href="style.css"><style>
 [hidden]{display:none!important}
 #cv[hidden]{display:none}
@@ -56,20 +57,51 @@ const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then
 
 const sc=(w,h)=>Math.min(800/Math.max(w,h),600/Math.min(w,h));
 const toB=(c,q)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
-async function dens(b){try{const a=new Uint8Array(await b.arrayBuffer());
-  if(a[0]===255&&a[1]===216&&a[2]===255&&a[3]===224&&a[6]===74&&a[7]===70){a[13]=1;a[14]=1;a[15]=44;a[16]=1;a[17]=44;return new Blob([a],{type:'image/jpeg'});}}catch(_){}return b;}
-async function enc(c){const LO=200000,HI=350000;let lo=.5,hi=.98,q=.9,best=null;
+const pad=n=>String(n).padStart(2,'0');
+const mkMeta=(t,p,src)=>({t,src,lat:p?p.coords.latitude:null,lon:p?p.coords.longitude:null,acc:p?Math.round(p.coords.accuracy):null});
+function descOf(m){if(!m)return'';const d=m.t,z=-d.getTimezoneOffset();
+  let s=`Taken: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} (UTC${z<0?'-':'+'}${pad(Math.floor(Math.abs(z)/60))}:${pad(Math.abs(z)%60)})`;
+  s+=m.lat!=null?` | GPS: ${m.lat.toFixed(6)}, ${m.lon.toFixed(6)} (+/-${m.acc} m) | https://www.google.com/maps?q=${m.lat.toFixed(6)},${m.lon.toFixed(6)}`:' | GPS: not available';
+  return s+' | Source: '+(m.src==='camera'?'camera':'gallery upload (time = file date, GPS = device location at upload)');}
+/*EXIF*/
+function exif(m){
+  const A=s=>[...s].map(c=>c.charCodeAt(0)&127).concat(0),U16=v=>[v>>8&255,v&255],U32=v=>[v>>>24&255,v>>16&255,v>>8&255,v&255];
+  const R=(a,b)=>U32(a).concat(U32(b)),E=(tag,type,count,bytes)=>({tag,type,count,bytes});
+  const d=m.t,ds=`${d.getFullYear()}:${pad(d.getMonth()+1)}:${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  const z=-d.getTimezoneOffset(),tzs=(z<0?'-':'+')+pad(Math.floor(Math.abs(z)/60))+':'+pad(Math.abs(z)%60);
+  const dms=v=>{v=Math.abs(v);const g=Math.floor(v),mi=Math.floor((v-g)*60),sc=((v-g)*60-mi)*60;return[...R(g,1),...R(mi,1),...R(Math.round(sc*10000),10000)];};
+  const sz=es=>2+12*es.length+4+es.reduce((n,e)=>n+(e.bytes.length>4?e.bytes.length+(e.bytes.length&1):0),0);
+  const out=(es,off)=>{es=[...es].sort((a,b)=>a.tag-b.tag);const h=[...U16(es.length)],dat=[];let dp=off+2+12*es.length+4;
+    for(const e of es){h.push(...U16(e.tag),...U16(e.type),...U32(e.count));
+      if(e.bytes.length>4){h.push(...U32(dp));dat.push(...e.bytes);if(e.bytes.length&1)dat.push(0);dp+=e.bytes.length+(e.bytes.length&1);}
+      else h.push(...e.bytes,...Array(4-e.bytes.length).fill(0));}
+    return h.concat(U32(0),dat);};
+  const desc=A(m.src==='camera'?'Source: camera':'Source: gallery upload');
+  const ex=[E(0x9003,2,20,A(ds)),E(0x9004,2,20,A(ds)),E(0x9011,2,7,A(tzs))];
+  const gp=m.lat!=null?[E(0,1,4,[2,3,0,0]),E(1,2,2,A(m.lat<0?'S':'N')),E(2,5,3,dms(m.lat)),E(3,2,2,A(m.lon<0?'W':'E')),E(4,5,3,dms(m.lon)),
+    E(7,5,3,[...R(d.getUTCHours(),1),...R(d.getUTCMinutes(),1),...R(d.getUTCSeconds(),1)]),
+    E(0x1D,2,11,A(`${d.getUTCFullYear()}:${pad(d.getUTCMonth()+1)}:${pad(d.getUTCDate())}`))]:null;
+  const mk=(eo,go)=>{const e=[E(0x010E,2,desc.length,desc),E(0x8769,4,1,U32(eo))];if(gp)e.push(E(0x8825,4,1,U32(go)));return e;};
+  const eo=8+sz(mk(0,0)),go=eo+sz(ex);
+  const body=[69,120,105,102,0,0,77,77,0,42,0,0,0,8,...out(mk(eo,go),8),...out(ex,eo),...(gp?out(gp,go):[])],len=body.length+2;
+  return Uint8Array.from([255,225,len>>8&255,len&255,...body]);}
+/*EXIFEND*/
+async function dens(b,m){try{let a=new Uint8Array(await b.arrayBuffer());
+  if(a[0]===255&&a[1]===216&&a[2]===255&&a[3]===224&&a[6]===74&&a[7]===70){a[13]=1;a[14]=1;a[15]=44;a[16]=1;a[17]=44;}
+  if(m){const x=exif(m),o=new Uint8Array(a.length+x.length);o.set(a.subarray(0,2));o.set(x,2);o.set(a.subarray(2),2+x.length);a=o;}
+  return new Blob([a],{type:'image/jpeg'});}catch(_){return b;}}
+async function enc(c,m){const LO=200000,HI=350000;let lo=.5,hi=.98,q=.9,best=null;
   for(let i=0;i<6;i++){const b=await toB(c,q);if(!b)break;
     const d=b.size<LO?LO-b.size:b.size>HI?b.size-HI:0;if(!best||d<best.d)best={b,d};
     if(!d)break;if(b.size>HI)hi=q;else lo=q;q=(lo+hi)/2;}
-  if(!best)throw new Error('Encode failed');return dens(best.b);}
-async function prep(f){const b=await createImageBitmap(f),s=sc(b.width,b.height),c=document.createElement('canvas');
+  if(!best)throw new Error('Encode failed');return dens(best.b,m);}
+async function prep(f,m){const b=await createImageBitmap(f),s=sc(b.width,b.height),c=document.createElement('canvas');
   c.width=Math.round(b.width*s);c.height=Math.round(b.height*s);const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(b,0,0,c.width,c.height);
-  return enc(c);}
+  return enc(c,m);}
 function rowH(x){const bar=x.s==='pend'?'':`<div class="pb"><i class="${x.s==='done'?'g':''}" style="width:${x.p}%"></i></div>`;
   const st=x.s==='done'?'<span class="tick">✔</span>':x.s==='up'?x.p+'%':x.s==='err'?'<span class="er">Failed</span>':'';
   const rm=(x.s==='pend'||x.s==='err')?`<button class="ib" onclick="rmv(${x.id})" aria-label="Remove photo">✕</button>`:'';
-  return `<div class="pr" id="r${x.id}"><img loading="lazy" src="${x.u}" alt=""><div class="pm"><div class="pn">Photo ${x.id}</div>${bar}</div><div class="ps">${st}</div>${rm}</div>`;}
+  return `<div class="pr" id="r${x.id}"><img loading="lazy" src="${x.u}" alt=""><div class="pm"><div class="pn">${esc(x.n||'Photo '+x.id)}</div>${bar}</div><div class="ps">${st}</div>${rm}</div>`;}
 function upd(x,full){const r=$('r'+x.id);if(!r)return;const i=r.querySelector('.pb i');
   if(!full&&x.s==='up'&&i){i.style.width=x.p+'%';r.querySelector('.ps').textContent=x.p+'%';}else r.outerHTML=rowH(x);}
 function stats(){const d=items.filter(x=>x.s==='done').length,p=items.filter(x=>x.s==='pend'||x.s==='err').length;
@@ -78,32 +110,43 @@ function stats(){const d=items.filter(x=>x.s==='done').length,p=items.filter(x=>
 function render(){$('pl').innerHTML=items.slice(0,vis).map(rowH).join('');
   const rem=items.length-vis;$('more').hidden=items.length<=5;$('more').textContent=rem>0?`Show more photos (${rem} more)`:'Show less';stats();}
 $('more').onclick=()=>{vis=items.length-vis>0?vis+10:5;render();};
-function addBlob(b){items.push({id:++seq,b,u:URL.createObjectURL(b),s:'pend',p:0});render();}
+function addBlob(b,m){items.push({id:++seq,meta:m,b,u:URL.createObjectURL(b),s:'pend',p:0});render();}
 function rmv(n){const k=items.findIndex(x=>x.id===n);if(k<0)return;URL.revokeObjectURL(items[k].u);items.splice(k,1);render();}
 $('up').onclick=()=>$('fu').click();
-$('fu').onchange=async e=>{const fs=[...e.target.files];e.target.value='';for(const f of fs){try{addBlob(await prep(f));}catch(_){}}};
+$('fu').onchange=async e=>{const fs=[...e.target.files];e.target.value='';const p=await getPos();
+  for(const f of fs){try{const m=mkMeta(new Date(f.lastModified||Date.now()),p,'gallery');addBlob(await prep(f,m),m);}catch(_){}}};
 
 let stream,track,torch=false,taken=0;
 function chkTorch(){const c=track&&track.getCapabilities?track.getCapabilities():{};$('flash').hidden=!c.torch;}
-$('cam').onclick=async()=>{try{
-  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1600},height:{ideal:1200}},audio:false});
-  track=stream.getVideoTracks()[0];torch=false;$('flash').classList.remove('on');chkTorch();$('vid').onplaying=chkTorch;$('vid').srcObject=stream;$('cv').hidden=false;try{$('cv').requestFullscreen&&$('cv').requestFullscreen().catch(()=>{});}catch(_){}taken=0;$('cvn').textContent='0 taken';
-}catch(e){$('msg').textContent='Camera unavailable: '+e.message;}};
+let pos=null,gw=null;
+function cvTxt(){$('cvn').textContent=taken+' taken · '+(pos?'GPS ✔':'GPS off');}
+function gStart(){if(!navigator.geolocation||gw!=null)return;
+  gw=navigator.geolocation.watchPosition(p=>{pos=p;cvTxt();},()=>cvTxt(),{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}
+function gStop(){if(gw!=null&&navigator.geolocation)navigator.geolocation.clearWatch(gw);gw=null;}
+const getPos=()=>pos&&Date.now()-pos.timestamp<120000?Promise.resolve(pos):new Promise(r=>navigator.geolocation?navigator.geolocation.getCurrentPosition(r,()=>r(null),{enableHighAccuracy:true,timeout:8000,maximumAge:60000}):r(null));
+function closeCam(){try{document.fullscreenElement&&document.exitFullscreen();}catch(_){}
+  stream&&stream.getTracks().forEach(t=>t.stop());stream=null;gStop();$('cv').hidden=true;}
+$('cam').onclick=async()=>{const cv=$('cv');cv.hidden=false;taken=0;cvTxt();
+  try{const r=(cv.requestFullscreen||cv.webkitRequestFullscreen||(()=>0)).call(cv);r&&r.catch&&r.catch(()=>{});}catch(_){}
+  gStart();
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1600},height:{ideal:1200}},audio:false});
+    track=stream.getVideoTracks()[0];torch=false;$('flash').classList.remove('on');chkTorch();$('vid').onplaying=chkTorch;$('vid').srcObject=stream;
+  }catch(e){closeCam();$('msg').textContent='Camera unavailable: '+e.message;}};
 $('flash').onclick=async()=>{try{torch=!torch;await track.applyConstraints({advanced:[{torch}]});$('flash').classList.toggle('on',torch);}
   catch(e){torch=false;$('flash').classList.remove('on');$('flash').hidden=true;}};
 $('shut').onclick=()=>{navigator.vibrate&&navigator.vibrate(25);const v=$('vid');if(!v.videoWidth)return;const s=sc(v.videoWidth,v.videoHeight),c=document.createElement('canvas');
   c.width=Math.round(v.videoWidth*s);c.height=Math.round(v.videoHeight*s);const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(v,0,0,c.width,c.height);
-  $('cvn').textContent=(++taken)+' taken';enc(c).then(addBlob).catch(()=>{});
+  const m=mkMeta(new Date(),pos,'camera');taken++;cvTxt();enc(c,m).then(b=>addBlob(b,m)).catch(()=>{});
   v.style.opacity=.3;setTimeout(()=>v.style.opacity=1,80);};
-$('cvdone').onclick=()=>{try{document.fullscreenElement&&document.exitFullscreen();}catch(_){}stream&&stream.getTracks().forEach(t=>t.stop());$('cv').hidden=true;};
+$('cvdone').onclick=closeCam;
 
 const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b);});
 $('sub').onclick=async()=>{busy=true;$('msg').textContent='';stats();let ok=true;
   for(const x of items.filter(x=>x.s==='pend'||x.s==='err')){
     x.s='up';x.p=0;upd(x,true);
     const t=setInterval(()=>{x.p=Math.min(90,x.p+Math.max(1,Math.round((90-x.p)*.12)));upd(x);},150);
-    try{const r=await post({action:'upload',name:Date.now()+'_'+x.id+'.jpg',type:'image/jpeg',data:await b64(x.b)});
-      if(!r.ok)throw new Error(r.error);x.s='done';x.p=100;
+    try{const r=await post({action:'upload',name:Date.now()+'_'+x.id+'.jpg',type:'image/jpeg',data:await b64(x.b),desc:descOf(x.meta)});
+      if(!r.ok)throw new Error(r.error);x.n=r.name;x.s='done';x.p=100;
     }catch(e){x.s='err';ok=false;$('msg').textContent='Upload interrupted ('+e.message+'). Tap Submit Photos to retry.';}
     clearInterval(t);upd(x,true);stats();if(!ok)break;}
   busy=false;stats();if(ok)$('msg').textContent='All photos uploaded ✔';};

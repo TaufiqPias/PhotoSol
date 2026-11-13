@@ -1,7 +1,7 @@
 // Google Apps Script backend. Paste into script.google.com, then Deploy > Web app (Execute as: Me, Access: Anyone)
 const ADMIN_KEY = "6039"; // secret password for creating vaults
 const NOTIFY_EMAIL = "taufiq.xenox@gmail.com"; // leave '' to email your own Google account
-const ROOT_NAME = "Photo Vaults"; // parent folder in your Drive
+const ROOT_NAME = "PhotoSol Vault"; // parent folder in your Drive
 
 function root_() {
   const i = DriveApp.getFoldersByName(ROOT_NAME);
@@ -17,6 +17,20 @@ function order_(id) {
     i = f.getFilesByName("order.json");
   if (!i.hasNext()) throw new Error("Invalid vault");
   return { f: f, data: JSON.parse(i.next().getBlob().getDataAsString()) };
+}
+function nextName_(fid) {
+  // psupload-01, psupload-02 ... per vault
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const P = PropertiesService.getScriptProperties(),
+      k = "n_" + fid,
+      n = (Number(P.getProperty(k)) || 0) + 1;
+    P.setProperty(k, String(n));
+    return "psupload-" + String(n).padStart(2, "0") + ".jpg";
+  } finally {
+    lock.releaseLock();
+  }
 }
 function doGet(e) {
   try {
@@ -39,14 +53,16 @@ function doPost(e) {
     const v = order_(b.id),
       f = v.f;
     if (b.action === "upload") {
-      f.createFile(
+      const name = nextName_(f.getId());
+      const file = f.createFile(
         Utilities.newBlob(
           Utilities.base64Decode(b.data),
           b.type || "image/jpeg",
-          b.name,
+          name,
         ),
       );
-      return out_({ ok: true });
+      if (b.desc) file.setDescription(String(b.desc).slice(0, 900));
+      return out_({ ok: true, name: name });
     }
     if (b.action === "submit") {
       const it = f.getFiles();
