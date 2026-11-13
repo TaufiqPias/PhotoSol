@@ -9,10 +9,10 @@
 .fg{display:grid;grid-template-columns:1fr;gap:0 14px}.full{grid-column:1/-1}
 @media(min-width:600px){.fg{grid-template-columns:repeat(2,1fr)}.s2{grid-column:span 2}}
 @media(min-width:1000px){.fg{grid-template-columns:repeat(4,1fr)}}
-#ins{display:grid;grid-template-columns:1fr;gap:0 14px}@media(min-width:900px){#ins{grid-template-columns:1fr 1fr}}
+#ins,#ins textarea,#list,.vr{width:100%}.fg>div{min-width:0}
 .act{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-direction:column;margin-top:6px}.act button,.act .msg{margin:0}
 @media(min-width:700px){.act{flex-direction:row}.act button{width:auto;padding:13px 34px}}
-#list{display:grid;grid-template-columns:1fr;column-gap:28px}@media(min-width:900px){#list{grid-template-columns:1fr 1fr}}
+
 .ins{position:relative;margin-bottom:8px}.ins .x{position:absolute;right:6px;top:6px}
 button.add{background:transparent;color:var(--pri);border:1px dashed var(--pri);padding:9px;font-size:.9rem}
 button.ib{width:34px;height:34px;padding:0;margin:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;color:var(--pri);border:1px solid var(--bd);border-radius:8px;flex:none}
