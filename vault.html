@@ -59,7 +59,7 @@ const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then
 const sc=(w,h)=>Math.min(800/Math.max(w,h),600/Math.min(w,h));
 const toB=(c,q)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
 const pad=n=>String(n).padStart(2,'0');
-const fmt=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const fmt=d=>{const h=d.getHours();return `${pad(d.getMonth()+1)}/${pad(d.getDate())}/${d.getFullYear()} - ${pad(h%12||12)}:${pad(d.getMinutes())} ${h<12?'AM':'PM'}`;};
 const mkMeta=(t,p,src)=>({t,src,lat:p?p.coords.latitude:null,lon:p?p.coords.longitude:null,acc:p?Math.round(p.coords.accuracy):null});
 function descOf(m){if(!m)return'';const d=m.t,z=-d.getTimezoneOffset();
   let s=`Taken: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} (UTC${z<0?'-':'+'}${pad(Math.floor(Math.abs(z)/60))}:${pad(Math.abs(z)%60)})`;
@@ -191,10 +191,10 @@ async function thumb(b){const bm=await createImageBitmap(b),s=Math.min(1,240/Mat
   return{d:c.toDataURL('image/jpeg',.7),w:c.width,h:c.height};}
 $('rcpt').onclick=async()=>{const b=$('rcpt');b.disabled=true;b.textContent='Preparing receipt…';
   try{const th=[];for(const x of items.filter(x=>x.s==='done'))th.push({...await thumb(x.b),name:x.n||'Photo '+x.id,when:x.meta?fmt(x.meta.t):''});
-    buildReceipt(window.jspdf.jsPDF,ORD,INS,th,when||new Date().toLocaleString()).save('Receipt_WO-'+String(ORD.wo).replace(/[^\w-]+/g,'_')+'.pdf');
+    buildReceipt(window.jspdf.jsPDF,ORD,INS,th,when||fmt(new Date())).save('Receipt_WO-'+String(ORD.wo).replace(/[^\w-]+/g,'_')+'.pdf');
   }catch(e){$('msg').textContent='Could not create receipt: '+e.message;}
   b.disabled=false;b.textContent='Download Receipt';};
 $('fin').onclick=async()=>{$('fin').disabled=true;try{const r=await post({action:'submit'});if(!r.ok)throw new Error(r.error);
-  gStop();when=new Date().toLocaleString();['cr','sub','fin','more','pl','count'].forEach(k=>$(k).hidden=true);$('thanks').hidden=false;$('msg').textContent='';}
+  gStop();when=fmt(new Date());['cr','sub','fin','more','pl','count'].forEach(k=>$(k).hidden=true);$('thanks').hidden=false;$('msg').textContent='';}
   catch(e){$('msg').textContent='Error: '+e.message;$('fin').disabled=false;}};
 </script></body></html>
