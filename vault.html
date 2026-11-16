@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
-<title>Photo Vault</title><link rel="stylesheet" href="style.css"><style>
+<title>Photo Vault</title><link rel="icon" type="image/svg+xml" href="favicon.svg"><link rel="stylesheet" href="style.css"><style>
 [hidden]{display:none!important}
 #cv[hidden]{display:none}
 #cv{position:fixed;left:0;top:0;width:100%;height:100vh;height:100dvh;background:#000;z-index:9;overflow:hidden}
@@ -42,19 +42,21 @@ button.ib{width:30px;height:30px;margin:0;padding:0;flex:none;background:transpa
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="config.js"></script><script>
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtD=s=>{s=String(s||'').trim();const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[2]}/${m[3]}/${m[1]}`:s;};
+const fmtP=s=>{let d=String(s||'').replace(/\D/g,'');if(d.length===11&&d[0]==='1')d=d.slice(1);return d.length===10?`(${d.slice(0,3)})-${d.slice(3,6)}-${d.slice(6)}`:String(s||'');};
 const id=new URLSearchParams(location.search).get('id');
 let items=[],seq=0,vis=5,busy=false,ORD=null,INS=[],when='';
 const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then(r=>r.json());
 (async()=>{try{
-  const r=await(await fetch(API_URL+'?id='+encodeURIComponent(id))).json();if(!r.ok)throw 0;const o=r.order;
+  const r=await(await fetch(API_URL+'?id='+encodeURIComponent(id))).json();if(!r.ok)throw r.error||0;const o=r.order;
   const kv=(k,v)=>v?`<div class="kv"><span>${k}</span><span>${esc(v)}</span></div>`:'';
   let ins=Array.isArray(o.instrs)&&o.instrs.length?o.instrs:(o.instr?[o.instr]:[]);
   if(ins.length===1&&/\n\n(?=\d+\. )/.test(ins[0]))ins=ins[0].split(/\n\n(?=\d+\. )/).map(t=>t.replace(/^\d+\.\s/,''));
-  $('info').innerHTML=`<h1>Work Order ${esc(o.wo)}</h1>`+kv('Address',o.address)+kv('Work Order Type',o.type)+kv('Due Date',o.due)+kv('Contractor',o.contractor)+
-   (o.phone?`<div class="kv"><span>Support Phone</span><a href="tel:${esc(o.phone.replace(/[^0-9+]/g,''))}">${esc(o.phone)}</a></div>`:'')+kv('LockBox',o.lock)+kv('Key Code',o.code)+kv('Payment',o.pay)+
+  $('info').innerHTML=`<h1>Work Order ${esc(o.wo)}</h1>`+kv('Address',o.address)+kv('Work Order Type',o.type)+kv('Due Date',fmtD(o.due))+kv('Contractor',o.contractor)+
+   (o.phone?`<div class="kv"><span>Support Phone</span><a href="tel:${esc(o.phone.replace(/[^0-9+]/g,''))}">${esc(fmtP(o.phone))}</a></div>`:'')+kv('LockBox',o.lock)+kv('Key Code',o.code)+kv('Payment',o.pay)+
    (ins.length?`<details style="margin-top:10px"><summary>Work order instructions</summary>${ins.map((t,i)=>`<div class="ii"><pre>${ins.length>1?(i+1)+'. ':''}${esc(t)}</pre></div>`).join('')}</details>`:'');
   ORD=o;INS=ins;$('act').hidden=false;gStart();cvTxt();
-}catch(e){$('info').textContent='This vault link is invalid.';}})();
+}catch(e){$('info').textContent=/expired/i.test(String(e))?'This vault has expired and is no longer available.':'This vault link is invalid.';}})();
 
 const sc=(w,h)=>Math.min(800/Math.max(w,h),600/Math.min(w,h));
 const toB=(c,q)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
@@ -62,7 +64,7 @@ const pad=n=>String(n).padStart(2,'0');
 const fmt=d=>{const h=d.getHours();return `${pad(d.getMonth()+1)}/${pad(d.getDate())}/${d.getFullYear()} - ${pad(h%12||12)}:${pad(d.getMinutes())} ${h<12?'AM':'PM'}`;};
 const mkMeta=(t,p,src)=>({t,src,lat:p?p.coords.latitude:null,lon:p?p.coords.longitude:null,acc:p?Math.round(p.coords.accuracy):null});
 function descOf(m){if(!m)return'';const d=m.t,z=-d.getTimezoneOffset();
-  let s=`Taken: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} (UTC${z<0?'-':'+'}${pad(Math.floor(Math.abs(z)/60))}:${pad(Math.abs(z)%60)})`;
+  let s=`Taken: ${pad(d.getMonth()+1)}/${pad(d.getDate())}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} (UTC${z<0?'-':'+'}${pad(Math.floor(Math.abs(z)/60))}:${pad(Math.abs(z)%60)})`;
   s+=m.lat!=null?` | GPS: ${m.lat.toFixed(6)}, ${m.lon.toFixed(6)} (+/-${m.acc} m) | https://www.google.com/maps?q=${m.lat.toFixed(6)},${m.lon.toFixed(6)}`:' | GPS: not available';
   return s+' | Source: '+(m.src==='camera'?'camera':'gallery upload (time = file date, GPS = device location at upload)');}
 /*EXIF*/
@@ -166,7 +168,7 @@ function buildReceipt(J,o,ins,th,when){
   y+=5;doc.setDrawColor(200);doc.line(M,y,W-M,y);y+=10;
   doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(26,34,48);doc.text('Work Order Receipt',M,y);
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(110);doc.text('Submitted: '+when,W-M,y,{align:'right'});y+=9;
-  const rows=[['Work Order #',o.wo],['Type',o.type],['Property Address',o.address],['Due Date',o.due],['Contractor',o.contractor],['Support Phone',o.phone],['LockBox',o.lock],['Key Code',o.code],['Payment',o.pay]].filter(r=>r[1]);
+  const rows=[['Work Order #',o.wo],['Type',o.type],['Property Address',o.address],['Due Date',fmtD(o.due)],['Contractor',o.contractor],['Support Phone',fmtP(o.phone)],['LockBox',o.lock],['Key Code',o.code],['Payment',o.pay]].filter(r=>r[1]);
   doc.setFontSize(10.5);
   for(const [k,v] of rows){const ls=doc.splitTextToSize(String(v),W-M-62);chk(ls.length*5+3);
     doc.setTextColor(110);doc.text(k,M,y);doc.setTextColor(26,34,48);doc.text(ls,62,y);y+=ls.length*5+2;doc.setDrawColor(230);doc.line(M,y-3.5,W-M,y-3.5);}

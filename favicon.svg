@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 300 300">
+  <defs>
+    <style>
+      .cls-1{fill:url(#radial-gradient-1);stroke:#000000;stroke-miterlimit:10}
+      .cls-2{fill:#4d4d4d;stroke:#000000;stroke-miterlimit:10}
+      .cls-3{fill:#e6e6e6;stroke:#000000;stroke-miterlimit:10}
+      .cls-4{fill:url(#radial-gradient-2);stroke:#000000;stroke-miterlimit:10}
+      .cls-5{fill:url(#radial-gradient-3);stroke:#000000;stroke-miterlimit:10}
+      .cls-6{fill:#333333;stroke:#000000;stroke-miterlimit:10}
+    </style>
+    <radialGradient id="radial-gradient-1" cx="150" cy="162.481" r="128.954" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6591" stop-color="#8093a6" data-vc-midpoint="0.6591"/>
+      <stop offset="1" stop-color="#00264e"/>
+    </radialGradient>
+    <radialGradient id="radial-gradient-2" cx="153.762" cy="162.481" r="67.925" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.3" stop-color="#80808b" data-vc-midpoint="0.3"/>
+      <stop offset="1" stop-color="#000116"/>
+    </radialGradient>
+    <filter id="filter-1" filterUnits="userSpaceOnUse" x="91.283" y="100.002" width="124.957" height="124.957" data-vc-blend="screen" color-interpolation-filters="sRGB"><feComponentTransfer in="SourceAlpha"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer><feGaussianBlur stdDeviation="5" result="glow"/><feFlood flood-color="#ffffff" flood-opacity="1"/><feComposite in2="glow" operator="in"/><feComposite in2="SourceAlpha" operator="in" result="paint"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="paint"/></feMerge></filter>
+    <radialGradient id="radial-gradient-3" cx="153.762" cy="162.481" r="59.979" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.3" stop-color="#80808b" data-vc-midpoint="0.3"/>
+      <stop offset="1" stop-color="#000116"/>
+    </radialGradient>
+  </defs>
+  <title>Favicon</title>
+  <g id="Layer_1" data-name="Layer 1">
+    <g>
+      <path d="M21.046 133.848 C21.046 78.442 65.961 33.527 121.367 33.527 L221.478 33.527 C253.221 33.527 278.954 59.26 278.954 91.002 L278.954 117.127 L203.504 117.127 L203.504 139.282 L278.954 139.282 L278.954 188.815 C278.954 245.49 233.009 291.434 176.334 291.434 L78.522 291.434 C46.779 291.434 21.046 265.702 21.046 233.959 L21.046 207.834 L81.866 207.834 L81.866 188.606 L21.046 188.606 Z" class="cls-1"/>
+      <g>
+        <path d="M67.38 159.686 C68.267 112.782 106.566 75.033 153.682 75.033 C201.354 75.033 239.999 113.678 239.999 161.35 C239.999 209.022 201.354 247.667 153.682 247.667 C137.396 247.667 122.163 244.291 109.165 236.451 L109.165 291.437 L79.159 291.64 C78.082 291.647 77.007 291.593 75.937 291.476 L70.802 290.918 C70.736 290.911 70.671 290.901 70.606 290.889 L67.38 290.304 Z" class="cls-2"/>
+        <path d="M77.543 162.481 C77.543 120.386 111.667 86.262 153.762 86.262 C195.857 86.262 229.981 120.386 229.981 162.481 C229.981 204.575 195.857 238.7 153.762 238.7 C133.436 238.7 114.968 230.743 101.303 217.774 L101.303 291.434 L77.543 291.434 Z" class="cls-3"/>
+      </g>
+      <g>
+        <path d="M85.837 162.481 C85.837 124.967 116.248 94.555 153.762 94.555 C191.276 94.555 221.687 124.967 221.687 162.481 C221.687 199.995 191.276 230.406 153.762 230.406 C116.248 230.406 85.837 199.995 85.837 162.481 Z" class="cls-4"/>
+        <g filter="url(#filter-1)">
+          <path d="M93.783 162.481 C93.783 129.355 120.637 102.502 153.762 102.502 C186.887 102.502 213.741 129.355 213.741 162.481 C213.741 195.606 186.887 222.459 153.762 222.459 C120.637 222.459 93.783 195.606 93.783 162.481 Z" class="cls-5"/>
+        </g>
+      </g>
+      <path d="M53.439 14.944 L53.439 8.359 L99.095 8.359 L99.095 14.944 L108.913 14.944 L108.913 28.641 C81.791 31.167 64.699 38.971 43.622 62.485 L43.622 14.944 Z" class="cls-6"/>
+    </g>
+  </g>
+</svg>
