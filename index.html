@@ -1,1820 +1,419 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>PhotoSol – Admin</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      [hidden] {
-        display: none !important;
-      }
-      .wrap {
-        max-width: 1200px;
-      }
-      @media (min-width: 900px) {
-        body {
-          padding: 24px;
-        }
-      }
-      .top {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin: 4px 0 18px;
-      }
-      .logo {
-        font:
-          800 2rem/1 system-ui,
-          sans-serif;
-        letter-spacing: -1.5px;
-      }
-      .logo span {
-        color: var(--pri);
-        font-weight: 300;
-        letter-spacing: -1px;
-      }
-      .who {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .co {
-        color: var(--mut);
-        font-size: 1.05rem;
-        font-weight: 600;
-        text-align: right;
-      }
-      .av {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: var(--card);
-        border: 1px solid var(--bd);
-        color: var(--pri);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex: none;
-      }
-      .av svg {
-        width: 20px;
-        height: 20px;
-      }
-      @media (max-width: 560px) {
-        .co {
-          font-size: 0.85rem;
-        }
-        .logo {
-          font-size: 1.6rem;
-        }
-      }
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PhotoSol – Admin</title><link rel="icon" type="image/svg+xml" href="favicon.svg"><link rel="stylesheet" href="style.css">
+<style>
+[hidden]{display:none!important}
+.wrap{max-width:1200px}
+@media(min-width:900px){body{padding:24px}}
+.top{display:flex;align-items:center;gap:14px;margin:4px 0 18px}
+.logo{font:800 2rem/1 system-ui,sans-serif;letter-spacing:-1.5px}.logo span{color:var(--pri);font-weight:300;letter-spacing:-1px}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px}
+.co{color:var(--mut);font-size:1.05rem;font-weight:600;text-align:right}
+.av{width:38px;height:38px;border-radius:50%;background:var(--card);border:1px solid var(--bd);color:var(--pri);display:flex;align-items:center;justify-content:center;flex:none}
+.av svg{width:20px;height:20px}
+@media(max-width:560px){.co{font-size:.85rem}.logo{font-size:1.6rem}}
 
-      .vh {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 12px;
-      }
-      .vh h1 {
-        margin: 0;
-      }
-      button.cbtn {
-        width: auto;
-        margin: 0;
-        padding: 10px 18px;
-        font-size: 0.95rem;
-      }
+.vh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.vh h1{margin:0}
+button.cbtn{width:auto;margin:0;padding:10px 18px;font-size:.95rem}
 
-      .fg {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0 14px;
-      }
-      .full {
-        grid-column: 1/-1;
-      }
-      @media (min-width: 600px) {
-        .fg {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .s2 {
-          grid-column: span 2;
-        }
-      }
-      @media (min-width: 1000px) {
-        .fg {
-          grid-template-columns: repeat(4, 1fr);
-        }
-      }
-      .fg > div {
-        min-width: 0;
-      }
-      #list,
-      .vr,
-      .insbox {
-        width: 100%;
-      }
-      .act {
-        display: flex;
-        gap: 14px;
-        align-items: center;
-        justify-content: space-between;
-        flex-direction: column;
-        margin-top: 6px;
-      }
-      .act button,
-      .act .msg {
-        margin: 0;
-      }
-      @media (min-width: 700px) {
-        .act {
-          flex-direction: row;
-        }
-        .act button {
-          width: auto;
-          padding: 13px 34px;
-        }
-      }
+.fg{display:grid;grid-template-columns:1fr;gap:0 14px}.full{grid-column:1/-1}
+@media(min-width:600px){.fg{grid-template-columns:repeat(2,1fr)}.s2{grid-column:span 2}}
+@media(min-width:1000px){.fg{grid-template-columns:repeat(4,1fr)}}
+.fg>div{min-width:0}#list,.vr,.insbox{width:100%}
+.act{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-direction:column;margin-top:6px}.act button,.act .msg{margin:0}
+@media(min-width:700px){.act{flex-direction:row}.act button{width:auto;padding:13px 34px}}
 
-      .ins {
-        position: relative;
-        margin-bottom: 8px;
-      }
-      .ins textarea {
-        width: 100%;
-      }
-      .ins button.x {
-        position: absolute;
-        right: 6px;
-        top: 6px;
-        width: 26px;
-        height: 26px;
-      }
-      button.add {
-        background: transparent;
-        color: var(--pri);
-        border: 1px dashed var(--pri);
-        padding: 9px;
-        font-size: 0.9rem;
-      }
-      button.ib {
-        width: 34px;
-        height: 34px;
-        padding: 0;
-        margin: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        color: var(--pri);
-        border: 1px solid var(--bd);
-        border-radius: 8px;
-        flex: none;
-      }
-      button.ib:hover {
-        background: var(--bg);
-      }
-      button.ib.dng {
-        color: #d03a3a;
-      }
-      button.ib svg {
-        width: 18px;
-        height: 18px;
-      }
-      input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        padding: 0;
-        flex: none;
-      }
-      .tb {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 8px;
-        font-size: 0.85rem;
-        color: var(--mut);
-      }
-      .tb label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin: 0;
-        color: inherit;
-      }
-      .tb button {
-        width: auto;
-        margin: 0 0 0 auto;
-        padding: 7px 12px;
-        font-size: 0.85rem;
-        background: #d03a3a;
-      }
-      .vr {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 0;
-        border-top: 1px solid var(--bd);
-      }
-      .vn {
-        flex: 1;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: 0.92rem;
-      }
-      .empty {
-        color: var(--mut);
-        font-size: 1.05rem;
-        padding: 36px 10px;
-        text-align: center;
-      }
-      .empty b {
-        color: var(--pri);
-      }
-      footer {
-        text-align: center;
-        color: var(--mut);
-        font-size: 0.85rem;
-        margin: 20px 0 6px;
-      }
-      footer div + div {
-        margin-top: 4px;
-      }
-      .mh h1 {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .tools {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 10px;
-      }
-      .tools input {
-        flex: 1 1 220px;
-        min-width: 0;
-      }
-      .tools select {
-        flex: 0 0 auto;
-        padding: 10px;
-        border: 1px solid var(--bd);
-        border-radius: 8px;
-        background: var(--bg);
-        color: var(--tx);
-        font: inherit;
-      }
-      .vm {
-        flex: 1;
-        min-width: 0;
-      }
-      .vt {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        min-width: 0;
-      }
-      .vt .vn {
-        flex: 0 1 auto;
-      }
-      .vd {
-        font-size: 0.78rem;
-        color: var(--mut);
-        margin-top: 2px;
-      }
-      .warn {
-        position: relative;
-        flex: none;
-        display: inline-flex;
-        color: #e8a100;
-        cursor: help;
-        outline: none;
-      }
-      .warn svg {
-        width: 18px;
-        height: 18px;
-      }
-      .warn[data-tip]::after {
-        content: attr(data-tip);
-        position: absolute;
-        left: -6px;
-        bottom: calc(100% + 6px);
-        width: max-content;
-        max-width: 250px;
-        background: #1a2230;
-        color: #fff;
-        padding: 6px 10px;
-        border-radius: 6px;
-        font-size: 0.78rem;
-        line-height: 1.3;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.12s;
-        z-index: 20;
-      }
-      .warn[data-tip]:hover::after,
-      .warn[data-tip]:focus::after {
-        opacity: 1;
-      }
-      .sd {
-        display: inline-flex;
-        flex: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--ok);
-        color: #fff;
-        align-items: center;
-        justify-content: center;
-        cursor: help;
-      }
-      .sd svg {
-        width: 12px;
-        height: 12px;
-        stroke-width: 3;
-      }
-      .vd {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2px 8px;
-      }
-      .vd .pc {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
-      .vd .pc svg {
-        width: 13px;
-        height: 13px;
-      }
-      button.ib.rop {
-        color: var(--ok);
-        border-color: var(--ok);
-      }
-      .who .sup {
-        width: auto;
-        margin: 0;
-        padding: 5px 12px;
-        background: var(--pri);
-        color: #fff;
-        font:
-          800 1rem system-ui,
-          sans-serif;
-        letter-spacing: 0.5px;
-      }
-      .who .sup:hover {
-        text-decoration: none;
-        scale: 1.08;
-        transition: scale 0.12s;
-      }
-      .note {
-        background: #fff4d6;
-        color: #6b4a00;
-        border: 1px solid #e8a100;
-        border-left-width: 5px;
-        border-radius: 10px;
-        padding: 12px 14px;
-        margin: 12px 0 4px;
-        font-size: 0.92rem;
-        line-height: 1.5;
-      }
-      @media (prefers-color-scheme: dark) {
-        .note {
-          background: #3a2d08;
-          color: #ffd98a;
-        }
-      }
-      .hp {
-        position: absolute;
-        left: -9999px;
-        width: 1px;
-        height: 1px;
-        opacity: 0;
-      }
-      #sgDone {
-        text-align: center;
-        padding: 18px 6px;
-      }
-      #sgDone h2 {
-        margin: 0 0 8px;
-        font-size: 1.15rem;
-      }
-      #sgDone p {
-        margin: 0 0 6px;
-        line-height: 1.5;
-      }
-      .fg2 {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0 14px;
-      }
-      .fg2 > div {
-        min-width: 0;
-      }
-      @media (min-width: 600px) {
-        .fg2 {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-      #expBar {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: #fff4d6;
-        color: #6b4a00;
-        border: 1px solid #e8a100;
-        border-radius: 10px;
-        padding: 10px 14px;
-        margin-bottom: 14px;
-        font-size: 0.92rem;
-      }
-      #expBar svg {
-        width: 20px;
-        height: 20px;
-        flex: none;
-        color: #e8a100;
-      }
-      #expBar button {
-        width: auto;
-        margin: 0 0 0 auto;
-        padding: 6px 14px;
-        font-size: 0.85rem;
-        background: #e8a100;
-        color: #1a1a1a;
-        flex: none;
-      }
-      @media (prefers-color-scheme: dark) {
-        #expBar {
-          background: #3a2d08;
-          color: #ffd98a;
-        }
-      }
-      .rm {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 12px 0 0;
-        color: var(--mut);
-        font-size: 0.85rem;
-      }
-      .rm input {
-        width: auto;
-      }
-      #login {
-        max-width: 420px;
-        margin: 40px auto;
-      }
-      #login .sub {
-        margin: 0 0 4px;
-        color: var(--mut);
-        font-size: 0.9rem;
-      }
-      .exl {
-        margin: 10px 0 4px;
-        padding: 0;
-        list-style: none;
-      }
-      .exl li {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 8px 0;
-        border-top: 1px solid var(--bd);
-        font-size: 0.92rem;
-      }
-      .exl .n {
-        min-width: 0;
-        word-break: break-word;
-      }
-      .exl .t {
-        color: #d03a3a;
-        font-weight: 600;
-        white-space: nowrap;
-      }
+.ins{position:relative;margin-bottom:8px}.ins textarea{width:100%}.ins button.x{position:absolute;right:6px;top:6px;width:26px;height:26px}
+button.add{background:transparent;color:var(--pri);border:1px dashed var(--pri);padding:9px;font-size:.9rem}
+button.ib{width:34px;height:34px;padding:0;margin:0;display:inline-flex;align-items:center;justify-content:center;background:transparent;color:var(--pri);border:1px solid var(--bd);border-radius:8px;flex:none}
+button.ib:hover{background:var(--bg)}button.ib.dng{color:#d03a3a}button.ib svg{width:18px;height:18px}
+input[type=checkbox]{width:18px;height:18px;padding:0;flex:none}
+.tb{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.85rem;color:var(--mut)}.tb label{display:flex;align-items:center;gap:6px;margin:0;color:inherit}
+.tb button{width:auto;margin:0 0 0 auto;padding:7px 12px;font-size:.85rem;background:#d03a3a}
+.vr{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--bd)}
+.vn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.92rem}
+.empty{color:var(--mut);font-size:1.05rem;padding:36px 10px;text-align:center}.empty b{color:var(--pri)}
+footer{text-align:center;color:var(--mut);font-size:.85rem;margin:20px 0 6px}footer div+div{margin-top:4px}
+.mh h1{display:flex;align-items:center;gap:8px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}.tools input{flex:1 1 220px;min-width:0}
+.tools select{flex:0 0 auto;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.vm{flex:1;min-width:0}.vt{display:flex;align-items:center;gap:6px;min-width:0}.vt .vn{flex:0 1 auto}
+.vd{font-size:.78rem;color:var(--mut);margin-top:2px}
+.warn{position:relative;flex:none;display:inline-flex;color:#e8a100;cursor:help;outline:none}.warn svg{width:18px;height:18px}
+.warn[data-tip]::after{content:attr(data-tip);position:absolute;left:-6px;bottom:calc(100% + 6px);width:max-content;max-width:250px;background:#1a2230;color:#fff;padding:6px 10px;border-radius:6px;font-size:.78rem;line-height:1.3;opacity:0;pointer-events:none;transition:opacity .12s;z-index:20}
+.warn[data-tip]:hover::after,.warn[data-tip]:focus::after{opacity:1}
+.sd{display:inline-flex;flex:none;width:20px;height:20px;border-radius:50%;background:var(--ok);color:#fff;align-items:center;justify-content:center;cursor:help}.sd svg{width:12px;height:12px;stroke-width:3}
+.vd{display:flex;flex-wrap:wrap;gap:2px 8px}.vd .pc{display:inline-flex;align-items:center;gap:4px}.vd .pc svg{width:13px;height:13px}
+button.ib.rop{color:var(--ok);border-color:var(--ok)}
+.who .sup{width:auto;margin:0;padding:8px 12px;background:transparent;color:var(--pri);font:800 1rem system-ui,sans-serif;letter-spacing:.5px}.who .sup:hover{text-decoration:underline}
+.note{background:#fff4d6;color:#6b4a00;border:1px solid #e8a100;border-left-width:5px;border-radius:10px;padding:12px 14px;margin:12px 0 4px;font-size:.92rem;line-height:1.5}
+@media(prefers-color-scheme:dark){.note{background:#3a2d08;color:#ffd98a}}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+#sgDone{text-align:center;padding:18px 6px}#sgDone h2{margin:0 0 8px;font-size:1.15rem}#sgDone p{margin:0 0 6px;line-height:1.5}
+.fg2{display:grid;grid-template-columns:1fr;gap:0 14px}.fg2>div{min-width:0}@media(min-width:600px){.fg2{grid-template-columns:repeat(2,1fr)}}
+#expBar{display:flex;align-items:center;gap:10px;background:#fff4d6;color:#6b4a00;border:1px solid #e8a100;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.92rem}
+#expBar svg{width:20px;height:20px;flex:none;color:#e8a100}#expBar button{width:auto;margin:0 0 0 auto;padding:6px 14px;font-size:.85rem;background:#e8a100;color:#1a1a1a;flex:none}
+@media(prefers-color-scheme:dark){#expBar{background:#3a2d08;color:#ffd98a}}
+.rm{display:flex;align-items:center;gap:8px;margin:12px 0 0;color:var(--mut);font-size:.85rem}.rm input{width:auto}
+#how{max-width:1100px;margin:48px auto 56px}#how h2{text-align:center;font-size:1.5rem;margin:0 0 50px;letter-spacing:-.3px}
+.hw{display:grid;grid-template-columns:repeat(4,1fr);gap:34px 28px;padding:0 10px}
+.hw-i{position:relative}
+.hw-i::before,.hw-i::after{content:"";position:absolute;height:4px;width:58px;border-radius:3px;opacity:.55;background:linear-gradient(90deg,var(--pri) 0 38px,transparent 38px 46px,var(--pri) 46px 58px)}
+.hw-i::before{top:-26px;right:26px}.hw-i::after{bottom:-24px;left:6px}
+.hw-b{position:absolute;top:-22px;left:-18px;width:98px;height:98px;border-radius:50%;background:linear-gradient(145deg,#5b9bff,#1d6fe0);opacity:.9}
+.hw-c{position:relative;z-index:1;min-height:176px;padding:20px 18px 20px;border-radius:30px;text-align:center;
+  background:linear-gradient(160deg,rgba(255,255,255,.78),rgba(255,255,255,.34));border:2px solid rgba(255,255,255,.85);
+  box-shadow:0 12px 26px rgba(29,111,224,.14),inset 0 1px 0 rgba(255,255,255,.9);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hw-ic{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;margin:0 0 16px;color:#fff;background:linear-gradient(145deg,#5b9bff,#1d6fe0);box-shadow:0 6px 14px rgba(29,111,224,.35)}.hw-ic svg{display:block;width:26px;height:26px}
+.hw-n{color:var(--pri);font-weight:800;letter-spacing:.3px;font-size:1.05rem;text-transform:uppercase}
+.hw-t{margin-top:8px;color:var(--tx);line-height:1.4;font-size:.95rem}
+@media(prefers-color-scheme:dark){.hw-c{background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border-color:rgba(255,255,255,.22);box-shadow:0 12px 26px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18)}.hw-n{color:#6aa5ff}}
+@media(max-width:900px){.hw{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.hw-b{left:-8px;width:84px;height:84px}.hw{gap:34px 18px;padding:0 4px}.hw-c{min-height:176px;padding:20px 12px}.hw-t{font-size:.88rem}}
+#login{max-width:420px;margin:40px auto}#login .sub{margin:0 0 4px;color:var(--mut);font-size:.9rem}
+.exl{margin:10px 0 4px;padding:0;list-style:none}.exl li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--bd);font-size:.92rem}
+.exl .n{min-width:0;word-break:break-word}.exl .t{color:#d03a3a;font-weight:600;white-space:nowrap}
 
-      /* modals */
-      .ov {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        padding: 20px 12px;
-        overflow: auto;
-        z-index: 50;
-      }
-      .modal {
-        background: var(--card);
-        border: 1px solid var(--bd);
-        border-radius: 12px;
-        padding: 16px;
-        width: 100%;
-        max-width: 900px;
-        margin: auto;
-      }
-      .modal.sm {
-        max-width: 640px;
-      }
-      .mh {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 6px;
-      }
-      .mh h1 {
-        margin: 0;
-      }
-      .sub {
-        color: var(--mut);
-        font-size: 0.88rem;
-        margin: 0 0 4px;
-        word-break: break-word;
-      }
+/* modals */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;justify-content:center;padding:20px 12px;overflow:auto;z-index:50}
+.modal{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;width:100%;max-width:900px;margin:auto}
+.modal.sm{max-width:640px}
+.mh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}.mh h1{margin:0}
+.sub{color:var(--mut);font-size:.88rem;margin:0 0 4px;word-break:break-word}
 
-      #toast {
-        position: fixed;
-        left: 50%;
-        bottom: 24px;
-        transform: translateX(-50%);
-        background: var(--ok);
-        color: #fff;
-        padding: 10px 18px;
-        border-radius: 10px;
-        font-size: 0.92rem;
-        z-index: 120;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
-      }
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ok);color:#fff;padding:10px 18px;border-radius:10px;font-size:.92rem;z-index:120;box-shadow:0 4px 18px rgba(0,0,0,.3)}
 
-      /* tutorial */
-      #tourBlock {
-        position: fixed;
-        inset: 0;
-        z-index: 80;
-      }
-      #tourHL {
-        position: fixed;
-        z-index: 81;
-        border-radius: 10px;
-        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.66);
-        outline: 2px solid var(--pri);
-        pointer-events: none;
-        transition:
-          left 0.2s,
-          top 0.2s,
-          width 0.2s,
-          height 0.2s;
-      }
-      #tourPop {
-        position: fixed;
-        z-index: 82;
-        width: min(340px, calc(100vw - 24px));
-        background: var(--card);
-        color: var(--tx);
-        border: 1px solid var(--pri);
-        border-radius: 12px;
-        padding: 14px 16px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
-      }
-      #tourPop h2 {
-        font-size: 1.05rem;
-        margin: 2px 0 6px;
-      }
-      #tourPop p {
-        margin: 0 0 12px;
-        font-size: 0.92rem;
-        line-height: 1.45;
-      }
-      #tourPop .tn {
-        font-size: 0.78rem;
-        color: var(--mut);
-      }
-      #tourPop .tbar {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-      #tourPop button {
-        width: auto;
-        margin: 0;
-        padding: 8px 16px;
-        font-size: 0.9rem;
-      }
-      #tourPop .tskip {
-        margin-right: auto;
-        background: transparent;
-        color: var(--mut);
-        padding: 8px 4px;
-      }
-      #tourPop .dots {
-        display: flex;
-        gap: 4px;
-        margin-bottom: 8px;
-      }
-      #tourPop .dots i {
-        height: 4px;
-        flex: 1;
-        border-radius: 2px;
-        background: var(--bd);
-      }
-      #tourPop .dots i.on {
-        background: var(--pri);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <header class="top">
-        <div class="logo">Photo<span>Sol</span></div>
-        <div class="who">
-          <button class="sup" id="signup" type="button">SIGN UP</button
-          ><button
-            class="ib"
-            id="help"
-            title="How to use this app"
-            aria-label="How to use this app"
-          ></button>
-          <button
-            class="ib"
-            id="signout"
-            title="Sign out"
-            aria-label="Sign out"
-            hidden
-          ></button
-          ><span class="co" id="co"></span
-          ><span class="av" id="avatar" title="Account"></span>
-        </div>
-      </header>
+/* tutorial */
+#tourBlock{position:fixed;inset:0;z-index:80}
+#tourHL{position:fixed;z-index:81;border-radius:10px;box-shadow:0 0 0 9999px rgba(0,0,0,.66);outline:2px solid var(--pri);pointer-events:none;transition:left .2s,top .2s,width .2s,height .2s}
+#tourPop{position:fixed;z-index:82;width:min(340px,calc(100vw - 24px));background:var(--card);color:var(--tx);border:1px solid var(--pri);border-radius:12px;padding:14px 16px;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+#tourPop h2{font-size:1.05rem;margin:2px 0 6px}#tourPop p{margin:0 0 12px;font-size:.92rem;line-height:1.45}
+#tourPop .tn{font-size:.78rem;color:var(--mut)}
+#tourPop .tbar{display:flex;gap:8px;align-items:center}
+#tourPop button{width:auto;margin:0;padding:8px 16px;font-size:.9rem}
+#tourPop .tskip{margin-right:auto;background:transparent;color:var(--mut);padding:8px 4px}
+#tourPop .dots{display:flex;gap:4px;margin-bottom:8px}#tourPop .dots i{height:4px;flex:1;border-radius:2px;background:var(--bd)}#tourPop .dots i.on{background:var(--pri)}
+</style></head><body><div class="wrap">
 
-      <div class="card" id="login">
-        <h1>Sign in</h1>
-        <p class="sub">Enter your admin key to load your vaults.</p>
-        <label for="key">Admin key</label
-        ><input
-          id="key"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Your admin key"
-        />
-        <label class="rm"
-          ><input type="checkbox" id="remember" checked /> Remember me on this
-          device</label
-        >
-        <button id="unlock">Load My Vaults</button>
-        <div class="msg" id="lmsg"></div>
-      </div>
-      <div id="app" hidden>
-        <div id="expBar" hidden>
-          <span id="expIc"></span><span id="expTxt"></span
-          ><button id="expView">View</button>
-        </div>
-        <div class="card" id="vaultCard">
-          <div class="vh">
-            <h1>Vaults (<span id="cnt">0</span>)</h1>
-            <button class="cbtn" id="openCreate">+ Create A Vault</button>
-          </div>
-          <div class="tools" id="tools">
-            <input
-              id="q"
-              type="search"
-              placeholder="Search by work order, address or date…"
-              autocomplete="off"
-              aria-label="Search vaults"
-            /><select id="sort" aria-label="Sort vaults">
-              <option value="new">Newest to oldest</option>
-              <option value="old">Oldest to newest</option>
-            </select>
-          </div>
-          <div class="tb" id="tbar">
-            <label><input type="checkbox" id="all" /> Select all</label
-            ><button id="bulk" disabled>Delete selected (0)</button>
-          </div>
-          <div id="list"></div>
-        </div>
-      </div>
-      <footer>
-        <div>
-          PhotoSol is a Photo Transport Module. It will not Store Photos for
-          Eternity.
-        </div>
-        <div>Developed by WolfSoft</div>
-      </footer>
-    </div>
+<header class="top"><div class="logo">Photo<span>Sol</span></div>
+<div class="who"><button class="sup" id="signup" type="button">SIGN UP</button><button class="ib" id="help" title="How to use this app" aria-label="How to use this app"></button>
+<button class="ib" id="signout" title="Sign out" aria-label="Sign out" hidden></button><span class="co" id="co"></span><span class="av" id="avatar" title="Account"></span></div></header>
 
-    <!-- Create modal -->
-    <div class="ov" id="cm" hidden>
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cmt">
-        <div class="mh">
-          <h1 id="cmt">Create Photo Vault</h1>
-          <button class="ib" id="cmx" title="Close" aria-label="Close"></button>
-        </div>
-        <div class="fg" id="fg">
-          <div><label>Work Order Number *</label><input id="wo" /></div>
-          <div>
-            <label>Work Order Type</label
-            ><input id="type" placeholder="e.g. Lawn cut" />
-          </div>
-          <div>
-            <label>Due Date</label
-            ><input
-              id="due"
-              inputmode="numeric"
-              placeholder="mm/dd/yyyy"
-              maxlength="10"
-              autocomplete="off"
-            />
-          </div>
-          <div><label>Contractor Name</label><input id="contractor" /></div>
-          <div class="s2">
-            <label>Property Address *</label><input id="address" />
-          </div>
-          <div>
-            <label>Support Phone</label
-            ><input
-              id="phone"
-              type="tel"
-              placeholder="(000)-000-0000"
-              maxlength="14"
-            />
-          </div>
-          <div><label>LockBox Number (optional)</label><input id="lock" /></div>
-          <div><label>Key Code (optional)</label><input id="code" /></div>
-          <div class="s2">
-            <label>Payment</label><input id="pay" placeholder="e.g. $85" />
-          </div>
-          <div class="full" id="insWrap">
-            <label>Work Order Instructions</label>
-            <div class="insbox" id="ins"></div>
-            <button type="button" class="add" id="addins">
-              + Add Another Instruction
-            </button>
-          </div>
-        </div>
-        <div class="act">
-          <div class="msg" id="msg"></div>
-          <button id="go">Create Photo Vault</button>
-        </div>
-      </div>
-    </div>
+<div class="card" id="login"><h1>Sign in</h1><p class="sub">Enter your admin key to load your vaults.</p>
+<label for="key">Admin key</label><input id="key" type="password" autocomplete="current-password" placeholder="Your admin key">
+<label class="rm"><input type="checkbox" id="remember" checked> Remember me on this device</label>
+<button id="unlock">Load My Vaults</button><div class="msg" id="lmsg"></div></div>
+<section id="how" aria-labelledby="howt"><h2 id="howt">How it Works</h2><div class="hw"><div class="hw-i"><div class="hw-b"></div><div class="hw-c"><span class="hw-ic"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v6M9 14h6"/></svg></span><div class="hw-n">Step 01</div><div class="hw-t">Create a vault</div></div></div><div class="hw-i"><div class="hw-b"></div><div class="hw-c"><span class="hw-ic"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg></span><div class="hw-n">Step 02</div><div class="hw-t">Send Link to vendor</div></div></div><div class="hw-i"><div class="hw-b"></div><div class="hw-c"><span class="hw-ic"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 17.6A5 5 0 0 0 18 8h-1.3A8 8 0 1 0 4 16.3"/><path d="M12 12v9"/><path d="m8 17 4 4 4-4"/></svg></span><div class="hw-n">Step 03</div><div class="hw-t">Receive Photos in Google Drive</div></div></div><div class="hw-i"><div class="hw-b"></div><div class="hw-c"><span class="hw-ic"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span><div class="hw-n">Step 04</div><div class="hw-t">Save photos in CRM</div></div></div></div></section>
+<div id="app" hidden>
+<div id="expBar" hidden><span id="expIc"></span><span id="expTxt"></span><button id="expView">View</button></div>
+<div class="card" id="vaultCard"><div class="vh"><h1>Vaults (<span id="cnt">0</span>)</h1><button class="cbtn" id="openCreate">+ Create A Vault</button></div>
+<div class="tools" id="tools"><input id="q" type="search" placeholder="Search by work order, address or date…" autocomplete="off" aria-label="Search vaults"><select id="sort" aria-label="Sort vaults"><option value="new">Newest to oldest</option><option value="old">Oldest to newest</option></select></div>
+<div class="tb" id="tbar"><label><input type="checkbox" id="all"> Select all</label><button id="bulk" disabled>Delete selected (0)</button></div>
+<div id="list"></div></div>
+</div>
+<footer><div>PhotoSol is a Photo Transport Module. It will not Store Photos for Eternity.</div><div>Developed by Taufiq Pias</div></footer></div>
 
-    <!-- Edit modal -->
-    <div class="ov" id="em" hidden>
-      <div
-        class="modal sm"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="emt"
-      >
-        <div class="mh">
-          <h1 id="emt">Edit Vault</h1>
-          <button class="ib" id="emx" title="Close" aria-label="Close"></button>
-        </div>
-        <p class="sub" id="emname"></p>
-        <div class="fg2">
-          <div>
-            <label>Due Date</label
-            ><input
-              id="edue"
-              inputmode="numeric"
-              placeholder="mm/dd/yyyy"
-              maxlength="10"
-              autocomplete="off"
-            />
-          </div>
-          <div><label>Contractor Name</label><input id="econtractor" /></div>
-          <div><label>LockBox Number</label><input id="elock" /></div>
-          <div><label>Key Code</label><input id="ecode" /></div>
-          <div class="full">
-            <label>Payment</label><input id="epay" placeholder="e.g. $85" />
-          </div>
-          <div class="full">
-            <label>Work Order Instructions</label>
-            <div class="insbox" id="eins"></div>
-            <button type="button" class="add" id="eadd">
-              + Add Another Instruction
-            </button>
-          </div>
-        </div>
-        <div class="act">
-          <div class="msg" id="emsg"></div>
-          <button id="esave">Save Changes</button>
-        </div>
-      </div>
-    </div>
+<!-- Create modal -->
+<div class="ov" id="cm" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="cmt">
+<div class="mh"><h1 id="cmt">Create Photo Vault</h1><button class="ib" id="cmx" title="Close" aria-label="Close"></button></div>
+<div class="fg" id="fg">
+<div><label>Work Order Number *</label><input id="wo"></div>
+<div><label>Work Order Type</label><input id="type" placeholder="e.g. Lawn cut"></div>
+<div><label>Due Date</label><input id="due" inputmode="numeric" placeholder="mm/dd/yyyy" maxlength="10" autocomplete="off"></div>
+<div><label>Contractor Name</label><input id="contractor"></div>
+<div class="s2"><label>Property Address *</label><input id="address"></div>
+<div><label>Support Phone</label><input id="phone" type="tel" placeholder="(000)-000-0000" maxlength="14"></div>
+<div><label>LockBox Number (optional)</label><input id="lock"></div>
+<div><label>Key Code (optional)</label><input id="code"></div>
+<div class="s2"><label>Payment</label><input id="pay" placeholder="e.g. $85"></div>
+<div class="full" id="insWrap"><label>Work Order Instructions</label><div class="insbox" id="ins"></div><button type="button" class="add" id="addins">+ Add Another Instruction</button></div>
+</div>
+<div class="act"><div class="msg" id="msg"></div><button id="go">Create Photo Vault</button></div>
+</div></div>
 
-    <!-- Expiry warning -->
-    <div class="ov" id="xm" hidden>
-      <div
-        class="modal sm"
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="xmt"
-      >
-        <div class="mh"><h1 id="xmt"></h1></div>
-        <p style="margin: 6px 0 0; line-height: 1.5">
-          The following vaults will be deleted within 3 days from both PhotoSol
-          &amp; Google Drive. Please save the photos elsewhere or create a new
-          vault. Once the Vault is deleted, we will not be held liable. PhotoSol
-          is only a Photo transfer Module. Not a Storage Solution
-        </p>
-        <ul class="exl" id="xl"></ul>
-        <button id="xok">I Understand</button>
-      </div>
-    </div>
+<!-- Edit modal -->
+<div class="ov" id="em" hidden><div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="emt">
+<div class="mh"><h1 id="emt">Edit Vault</h1><button class="ib" id="emx" title="Close" aria-label="Close"></button></div>
+<p class="sub" id="emname"></p>
+<div class="fg2">
+<div><label>Due Date</label><input id="edue" inputmode="numeric" placeholder="mm/dd/yyyy" maxlength="10" autocomplete="off"></div>
+<div><label>Contractor Name</label><input id="econtractor"></div>
+<div><label>LockBox Number</label><input id="elock"></div>
+<div><label>Key Code</label><input id="ecode"></div>
+<div class="full"><label>Payment</label><input id="epay" placeholder="e.g. $85"></div>
+<div class="full"><label>Work Order Instructions</label><div class="insbox" id="eins"></div>
+<button type="button" class="add" id="eadd">+ Add Another Instruction</button></div>
+</div>
+<div class="act"><div class="msg" id="emsg"></div><button id="esave">Save Changes</button></div>
+</div></div>
 
-    <!-- Sign up -->
-    <div class="ov" id="sg" hidden>
-      <div
-        class="modal sm"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="sgt"
-      >
-        <div class="mh">
-          <h1 id="sgt">Sign Up</h1>
-          <button class="ib" id="sgx" title="Close" aria-label="Close"></button>
-        </div>
-        <div id="sgForm">
-          <p class="sub">
-            Tell us about your company and we will set up your account.
-          </p>
-          <div class="fg2">
-            <div>
-              <label for="sgname">Full Name *</label
-              ><input id="sgname" autocomplete="name" />
-            </div>
-            <div>
-              <label for="sgemail">Personal Email *</label
-              ><input id="sgemail" type="email" autocomplete="email" />
-            </div>
-            <div>
-              <label for="sgcemail">Company Email for Notification *</label
-              ><input id="sgcemail" type="email" />
-            </div>
-            <div>
-              <label for="sgco">Company Name *</label
-              ><input id="sgco" autocomplete="organization" />
-            </div>
-            <div>
-              <label for="sgphone">Contact Number *</label
-              ><input
-                id="sgphone"
-                type="tel"
-                inputmode="tel"
-                autocomplete="tel"
-              />
-            </div>
-            <div>
-              <label for="sgwa">WhatsApp Number *</label
-              ><input id="sgwa" type="tel" inputmode="tel" />
-            </div>
-            <div class="full">
-              <label for="sgaddr">Address (BD) *</label
-              ><textarea
-                id="sgaddr"
-                rows="3"
-                autocomplete="street-address"
-              ></textarea>
-            </div>
-          </div>
-          <input
-            class="hp"
-            id="sgweb"
-            tabindex="-1"
-            autocomplete="off"
-            aria-hidden="true"
-          />
-          <div class="note" role="note">
-            <b>Please note:</b> PhotoSol is an End-to-End encrypted photo
-            transportation system. For encryption, it takes us 24 hours to
-            prepare your ID with Google's system. Please be patient. Someone
-            from our TEAM will email you your ADMIN_KEY within 24 hours.
-          </div>
-          <div class="act">
-            <div class="msg" id="sgmsg"></div>
-            <button id="sgsend">Submit Sign Up</button>
-          </div>
-        </div>
-        <div id="sgDone" hidden>
-          <h2>✔ Request received</h2>
-          <p>
-            Thank you! Someone from our TEAM will email your ADMIN_KEY to your
-            personal email within 24 hours.
-          </p>
-          <button id="sgok">Close</button>
-        </div>
-      </div>
-    </div>
+<!-- Expiry warning -->
+<div class="ov" id="xm" hidden><div class="modal sm" role="alertdialog" aria-modal="true" aria-labelledby="xmt">
+<div class="mh"><h1 id="xmt"></h1></div>
+<p style="margin:6px 0 0;line-height:1.5">The following vaults will be deleted within 3 days from both PhotoSol &amp; Google Drive. Please save the photos elsewhere or create a new vault. Once the Vault is deleted, we will not be held liable. PhotoSol is only a Photo transfer Module. Not a Storage Solution</p>
+<ul class="exl" id="xl"></ul>
+<button id="xok">I Understand</button>
+</div></div>
 
-    <!-- Tutorial -->
-    <div id="tour" hidden>
-      <div id="tourBlock"></div>
-      <div id="tourHL"></div>
-      <div id="tourPop" role="dialog" aria-live="polite">
-        <div class="dots" id="tpDots"></div>
-        <div class="tn" id="tpN"></div>
-        <h2 id="tpT"></h2>
-        <p id="tpB"></p>
-        <div class="tbar">
-          <button class="tskip" id="tpSkip">Skip</button
-          ><button class="sec" id="tpBack">Back</button
-          ><button id="tpNext">Next</button>
-        </div>
-      </div>
-    </div>
-    <div id="toast" hidden></div>
+<!-- Sign up -->
+<div class="ov" id="sg" hidden><div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="sgt">
+<div class="mh"><h1 id="sgt">Sign Up</h1><button class="ib" id="sgx" title="Close" aria-label="Close"></button></div>
+<div id="sgForm">
+<p class="sub">Tell us about your company and we will set up your account.</p>
+<div class="fg2">
+<div><label for="sgname">Full Name *</label><input id="sgname" autocomplete="name"></div>
+<div><label for="sgemail">Personal Email *</label><input id="sgemail" type="email" autocomplete="email"></div>
+<div><label for="sgcemail">Company Email for Notification *</label><input id="sgcemail" type="email"></div>
+<div><label for="sgco">Company Name *</label><input id="sgco" autocomplete="organization"></div>
+<div><label for="sgphone">Contact Number *</label><input id="sgphone" type="tel" inputmode="tel" autocomplete="tel"></div>
+<div><label for="sgwa">WhatsApp Number *</label><input id="sgwa" type="tel" inputmode="tel"></div>
+<div class="full"><label for="sgaddr">Address (BD) *</label><textarea id="sgaddr" rows="3" autocomplete="street-address"></textarea></div>
+</div>
+<input class="hp" id="sgweb" tabindex="-1" autocomplete="off" aria-hidden="true">
+<div class="note" role="note"><b>Please note:</b> PhotoSol is an End-to-End encrypted photo transportation system. For encryption, it takes us 24 hours to prepare your ID with Google's system. Please be patient. Someone from our TEAM will email you your ADMIN_KEY within 24 hours.</div>
+<div class="act"><div class="msg" id="sgmsg"></div><button id="sgsend">Submit Sign Up</button></div>
+</div>
+<div id="sgDone" hidden><h2>✔ Request received</h2><p>Thank you! Someone from our TEAM will email your ADMIN_KEY to your personal email within 24 hours.</p><button id="sgok">Close</button></div>
+</div></div>
 
-    <script src="config.js"></script>
-    <script>
-      const $ = (id) => document.getElementById(id),
-        esc = (s) =>
-          String(s).replace(
-            /[&<>"]/g,
-            (c) =>
-              ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
-          );
-      const S =
-        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"';
-      const I = {
-        d: `<svg ${S}><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`,
-        c: `<svg ${S}><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>`,
-        t: `<svg ${S}><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg>`,
-        x: `<svg ${S}><path d="M6 6l12 12M18 6L6 18"/></svg>`,
-        e: `<svg ${S}><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`,
-        u: `<svg ${S}><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>`,
-        h: `<svg ${S}><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4.5M12 17.5h.01"/></svg>`,
-      };
-      I.w = `<svg ${S}><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>`;
-      I.k = `<svg ${S}><path d="M5 12l5 5L20 7"/></svg>`;
-      I.p = `<svg ${S}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
-      I.r = `<svg ${S}><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>`;
-      $("help").innerHTML = I.h;
-      $("signout").innerHTML =
-        `<svg ${S}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>`;
-      $("expIc").innerHTML = I.w;
-      $("xmt").innerHTML =
-        '<span class="warn" style="cursor:default">' +
-        I.w +
-        "</span> Vaults Expiring Soon";
-      $("avatar").innerHTML = I.u;
-      $("sgx").innerHTML = I.x;
-      $("cmx").innerHTML = I.x;
-      $("emx").innerHTML = I.x;
+<!-- Tutorial -->
+<div id="tour" hidden><div id="tourBlock"></div><div id="tourHL"></div>
+<div id="tourPop" role="dialog" aria-live="polite"><div class="dots" id="tpDots"></div><div class="tn" id="tpN"></div><h2 id="tpT"></h2><p id="tpB"></p>
+<div class="tbar"><button class="tskip" id="tpSkip">Skip</button><button class="sec" id="tpBack">Back</button><button id="tpNext">Next</button></div></div></div>
+<div id="toast" hidden></div>
 
-      localStorage.removeItem("pvList"); // the list now comes from the server
-      let KEY = localStorage.pvKey || sessionStorage.pvKey || "",
-        USER = "",
-        vaults = [],
-        sel = new Set(),
-        editIdx = -1;
-      const vid = (v) => new URL(v.link).searchParams.get("id");
-      let tt;
-      function toast(m) {
-        const t = $("toast");
-        t.textContent = m;
-        t.hidden = false;
-        clearTimeout(tt);
-        tt = setTimeout(() => (t.hidden = true), 2400);
-      }
+<script src="config.js"></script><script>
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const S='fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"';
+const I={d:`<svg ${S}><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`,
+c:`<svg ${S}><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>`,
+t:`<svg ${S}><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg>`,
+x:`<svg ${S}><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+e:`<svg ${S}><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`,
+u:`<svg ${S}><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>`,
+h:`<svg ${S}><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4.5M12 17.5h.01"/></svg>`};
+I.w=`<svg ${S}><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>`;
+I.k=`<svg ${S}><path d="M5 12l5 5L20 7"/></svg>`;
+I.p=`<svg ${S}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+I.r=`<svg ${S}><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>`;
+$('help').innerHTML=I.h;$('signout').innerHTML=`<svg ${S}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>`;$('expIc').innerHTML=I.w;$('xmt').innerHTML='<span class="warn" style="cursor:default">'+I.w+'</span> Vaults Expiring Soon';$('avatar').innerHTML=I.u;$('sgx').innerHTML=I.x;$('cmx').innerHTML=I.x;$('emx').innerHTML=I.x;
 
-      /* ---------- formatting ---------- */
-      function fmtPhone(v) {
-        let d = String(v).replace(/\D/g, "");
-        if (d.length > 10 && d[0] === "1") d = d.slice(1);
-        d = d.slice(0, 10);
-        return !d
-          ? ""
-          : d.length <= 3
-            ? "(" + d
-            : d.length <= 6
-              ? "(" + d.slice(0, 3) + ")-" + d.slice(3)
-              : "(" + d.slice(0, 3) + ")-" + d.slice(3, 6) + "-" + d.slice(6);
-      }
-      function fmtDate(v) {
-        const d = String(v).replace(/\D/g, "").slice(0, 8);
-        return d.length <= 2
-          ? d
-          : d.length <= 4
-            ? d.slice(0, 2) + "/" + d.slice(2)
-            : d.slice(0, 2) + "/" + d.slice(2, 4) + "/" + d.slice(4);
-      }
-      function validDate(s) {
-        const m = s.match(/^(\d\d)\/(\d\d)\/(\d{4})$/);
-        if (!m) return false;
-        const d = new Date(+m[3], m[1] - 1, +m[2]);
-        return d.getMonth() == m[1] - 1 && d.getDate() == +m[2];
-      }
-      $("phone").oninput = (e) => {
-        e.target.value = fmtPhone(e.target.value);
-      };
-      $("due").oninput = (e) => {
-        e.target.value = fmtDate(e.target.value);
-      };
+localStorage.removeItem('pvList'); // the list now comes from the server
+let KEY=localStorage.pvKey||sessionStorage.pvKey||'',USER='',vaults=[],sel=new Set(),editIdx=-1;
+const vid=v=>new URL(v.link).searchParams.get('id');
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400);}
 
-      /* ---------- modals ---------- */
-      const lock = () => {
-        document.body.style.overflow =
-          !$("cm").hidden ||
-          !$("em").hidden ||
-          !$("xm").hidden ||
-          !$("sg").hidden
-            ? "hidden"
-            : "";
-      };
-      const openM = (id) => {
-        $(id).hidden = false;
-        lock();
-      };
-      const closeM = (id) => {
-        $(id).hidden = true;
-        lock();
-      };
-      ["cm", "em", "xm", "sg"].forEach((id) =>
-        $(id).addEventListener("mousedown", (e) => {
-          if (e.target === $(id) && !tourOpen) closeM(id);
-        }),
-      );
-      $("cmx").onclick = () => closeM("cm");
-      $("emx").onclick = () => closeM("em");
-      document.addEventListener("keydown", (e) => {
-        if (e.key !== "Escape") return;
-        if (tourOpen) endTour();
-        else {
-          closeM("cm");
-          closeM("em");
-          closeM("xm");
-          closeM("sg");
-        }
-      });
-      $("openCreate").onclick = () => {
-        $("msg").textContent = "";
-        openM("cm");
-      };
+/* ---------- formatting ---------- */
+function fmtPhone(v){let d=String(v).replace(/\D/g,'');if(d.length>10&&d[0]==='1')d=d.slice(1);d=d.slice(0,10);
+  return !d?'':d.length<=3?'('+d:d.length<=6?'('+d.slice(0,3)+')-'+d.slice(3):'('+d.slice(0,3)+')-'+d.slice(3,6)+'-'+d.slice(6);}
+function fmtDate(v){const d=String(v).replace(/\D/g,'').slice(0,8);
+  return d.length<=2?d:d.length<=4?d.slice(0,2)+'/'+d.slice(2):d.slice(0,2)+'/'+d.slice(2,4)+'/'+d.slice(4);}
+function validDate(s){const m=s.match(/^(\d\d)\/(\d\d)\/(\d{4})$/);if(!m)return false;const d=new Date(+m[3],m[1]-1,+m[2]);return d.getMonth()==m[1]-1&&d.getDate()==+m[2];}
+$('phone').oninput=e=>{e.target.value=fmtPhone(e.target.value);};
+$('due').oninput=e=>{e.target.value=fmtDate(e.target.value);};
 
-      /* ---------- instruction boxes ---------- */
-      function addIns(box, val) {
-        const d = document.createElement("div");
-        d.className = "ins";
-        const ta = document.createElement("textarea");
-        ta.rows = 3;
-        ta.placeholder = "Instruction";
-        ta.value = val || "";
-        d.appendChild(ta);
-        if (box.children.length) {
-          const b = document.createElement("button");
-          b.type = "button";
-          b.className = "ib x";
-          b.title = "Remove instruction";
-          b.innerHTML = I.x;
-          b.onclick = () => d.remove();
-          d.appendChild(b);
-        }
-        box.appendChild(d);
-        return ta;
-      }
-      const getParts = (box) =>
-        [...box.querySelectorAll("textarea")]
-          .map((t) => t.value.trim())
-          .filter(Boolean);
-      const joinIns = (p) =>
-        p.length > 1
-          ? p.map((t, i) => i + 1 + ". " + t).join("\n\n")
-          : p[0] || "";
-      addIns($("ins"));
-      $("addins").onclick = () => addIns($("ins")).focus();
-      $("eadd").onclick = () => addIns($("eins")).focus();
+/* ---------- modals ---------- */
+const lock=()=>{document.body.style.overflow=(!$('cm').hidden||!$('em').hidden||!$('xm').hidden||!$('sg').hidden)?'hidden':'';};
+const openM=id=>{$(id).hidden=false;lock();};
+const closeM=id=>{$(id).hidden=true;lock();};
+['cm','em','xm','sg'].forEach(id=>$(id).addEventListener('mousedown',e=>{if(e.target===$(id)&&!tourOpen)closeM(id);}));
+$('cmx').onclick=()=>closeM('cm');$('emx').onclick=()=>closeM('em');
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(tourOpen)endTour();else{closeM('cm');closeM('em');closeM('xm');closeM('sg');}});
+$('openCreate').onclick=()=>{$('msg').textContent='';openM('cm');};
 
-      /* ---------- vault list ---------- */
-      const DAY = 864e5,
-        LIFE = 30 * DAY,
-        WARN = 3 * DAY;
-      const p2 = (n) => String(n).padStart(2, "0");
-      const fmtC = (t) => {
-        if (!t) return "Unknown";
-        const d = new Date(t);
-        return (
-          p2(d.getMonth() + 1) + "/" + p2(d.getDate()) + "/" + d.getFullYear()
-        );
-      };
-      const left = (v) =>
-        v.created ? v.created + LIFE - Date.now() : Infinity; // ms until auto-delete
-      const NOREC =
-        "No record found. Vault might have expired. Please check your Google Drive Trash Folder if the vault had been created within 60 days.";
-      const WARN10 = 10 * DAY,
-        daysLeft = (v) => Math.max(1, Math.ceil(left(v) / DAY));
-      function warnH(v) {
-        if (!v.created || left(v) > WARN10) return "";
-        const n = daysLeft(v),
-          t =
-            "This VAULT will be deleted within (" +
-            n +
-            ") " +
-            (n === 1 ? "Day" : "Days") +
-            ". Please save your data.";
-        return `<span class="warn" tabindex="0" data-tip="${t}" aria-label="${t}">${I.w}</span>`;
-      }
-      const validTill = (v) => (v.created ? fmtC(v.created + LIFE) : "Unknown");
-      let q = "",
-        sortBy = "new",
-        lastKey = "";
-      function shown() {
-        const s = q.trim().toLowerCase();
-        return vaults
-          .map((v, i) => ({ v, i }))
-          .filter(
-            (x) =>
-              !s ||
-              (x.v.name + " " + fmtC(x.v.created)).toLowerCase().includes(s),
-          )
-          .sort((a, b) =>
-            sortBy === "new"
-              ? (b.v.created || 0) - (a.v.created || 0)
-              : (a.v.created || 0) - (b.v.created || 0),
-          );
-      }
-      function render() {
-        const view = shown(),
-          vs = view.filter((x) => sel.has(x.v.link));
-        $("list").innerHTML = !vaults.length
-          ? '<div class="empty">Please <b>CREATE A VAULT</b> to start</div>'
-          : !view.length
-            ? `<div class="empty">${NOREC}</div>`
-            : view
-                .map(
-                  ({
-                    v,
-                    i,
-                  }) => `<div class="vr"><input type="checkbox" data-i="${i}" ${sel.has(v.link) ? "checked" : ""}>
-<div class="vm"><div class="vt"><div class="vn" title="${esc(v.name)}">${esc(v.name)}</div>${v.submitted ? `<span class="sd" tabindex="0" title="Order submitted by the contractor" aria-label="Order submitted by the contractor">${I.k}</span>` : ""}${warnH(v)}</div><div class="vd"><span>Created: ${fmtC(v.created)}</span><span>Valid till: ${validTill(v)}</span><span class="pc" title="Photos in this vault">${I.p} ${v.photos || 0} photo${v.photos === 1 ? "" : "s"}</span></div></div>
-${v.submitted ? `<button class="ib rop" title="Reopen submitted order" aria-label="Reopen submitted order" onclick="reopen(${i})">${I.r}</button>` : ""}
+/* ---------- instruction boxes ---------- */
+function addIns(box,val){const d=document.createElement('div');d.className='ins';
+  const ta=document.createElement('textarea');ta.rows=3;ta.placeholder='Instruction';ta.value=val||'';d.appendChild(ta);
+  if(box.children.length){const b=document.createElement('button');b.type='button';b.className='ib x';b.title='Remove instruction';b.innerHTML=I.x;b.onclick=()=>d.remove();d.appendChild(b);}
+  box.appendChild(d);return ta;}
+const getParts=box=>[...box.querySelectorAll('textarea')].map(t=>t.value.trim()).filter(Boolean);
+const joinIns=p=>p.length>1?p.map((t,i)=>(i+1)+'. '+t).join('\n\n'):(p[0]||'');
+addIns($('ins'));$('addins').onclick=()=>addIns($('ins')).focus();$('eadd').onclick=()=>addIns($('eins')).focus();
+
+/* ---------- vault list ---------- */
+const DAY=864e5,LIFE=30*DAY,WARN=3*DAY;
+const p2=n=>String(n).padStart(2,'0');
+const fmtC=t=>{if(!t)return'Unknown';const d=new Date(t);return p2(d.getMonth()+1)+'/'+p2(d.getDate())+'/'+d.getFullYear();};
+const left=v=>v.created?v.created+LIFE-Date.now():Infinity;   // ms until auto-delete
+const NOREC='No record found. Vault might have expired. Please check your Google Drive Trash Folder if the vault had been created within 60 days.';
+const WARN10=10*DAY,daysLeft=v=>Math.max(1,Math.ceil(left(v)/DAY));
+function warnH(v){if(!v.created||left(v)>WARN10)return'';const n=daysLeft(v),t='This VAULT will be deleted within ('+n+') '+(n===1?'Day':'Days')+'. Please save your data.';
+  return `<span class="warn" tabindex="0" data-tip="${t}" aria-label="${t}">${I.w}</span>`;}
+const validTill=v=>v.created?fmtC(v.created+LIFE):'Unknown';
+let q='',sortBy='new',lastKey='';
+function shown(){const s=q.trim().toLowerCase();
+  return vaults.map((v,i)=>({v,i})).filter(x=>!s||(x.v.name+' '+fmtC(x.v.created)).toLowerCase().includes(s))
+    .sort((a,b)=>sortBy==='new'?(b.v.created||0)-(a.v.created||0):(a.v.created||0)-(b.v.created||0));}
+function render(){
+  const view=shown(),vs=view.filter(x=>sel.has(x.v.link));
+  $('list').innerHTML=!vaults.length?'<div class="empty">Please <b>CREATE A VAULT</b> to start</div>':!view.length?`<div class="empty">${NOREC}</div>`:
+  view.map(({v,i})=>`<div class="vr"><input type="checkbox" data-i="${i}" ${sel.has(v.link)?'checked':''}>
+<div class="vm"><div class="vt"><div class="vn" title="${esc(v.name)}">${esc(v.name)}</div>${v.submitted?`<span class="sd" tabindex="0" title="Order submitted by the contractor" aria-label="Order submitted by the contractor">${I.k}</span>`:''}${warnH(v)}</div><div class="vd"><span>Created: ${fmtC(v.created)}</span><span>Valid till: ${validTill(v)}</span><span class="pc" title="Photos in this vault">${I.p} ${v.photos||0} photo${v.photos===1?'':'s'}</span></div></div>
+${v.submitted?`<button class="ib rop" title="Reopen submitted order" aria-label="Reopen submitted order" onclick="reopen(${i})">${I.r}</button>`:''}
 <button class="ib ed" title="Edit vault" onclick="openEdit(${i})">${I.e}</button>
 <button class="ib dr" title="Open Google Drive folder" onclick="window.open(vaults[${i}].drive)">${I.d}</button>
 <button class="ib cp" title="Copy link" onclick="copyL(${i})">${I.c}</button>
-<button class="ib dng" title="Delete vault" onclick="rm([${i}])">${I.t}</button></div>`,
-                )
-                .join("");
-        $("tbar").hidden = !vaults.length;
-        $("tools").hidden = !vaults.length;
-        $("cnt").textContent = vaults.length;
-        $("bulk").disabled = !vs.length;
-        $("bulk").textContent = "Delete selected (" + vs.length + ")";
-        $("all").checked = view.length > 0 && vs.length === view.length;
-        lastKey = dayKey();
-        expBar();
-      }
-      $("q").oninput = (e) => {
-        q = e.target.value;
-        render();
-      };
-      $("sort").onchange = (e) => {
-        sortBy = e.target.value;
-        render();
-      };
-      $("list").onchange = (e) => {
-        const v = vaults[e.target.dataset.i];
-        if (!v) return;
-        e.target.checked ? sel.add(v.link) : sel.delete(v.link);
-        render();
-      };
-      $("all").onchange = (e) => {
-        shown().forEach((x) =>
-          e.target.checked ? sel.add(x.v.link) : sel.delete(x.v.link),
-        );
-        render();
-      };
-      $("bulk").onclick = () =>
-        rm(
-          shown()
-            .filter((x) => sel.has(x.v.link))
-            .map((x) => x.i),
-        );
-      async function rm(ix) {
-        if (
-          !ix.length ||
-          !confirm(
-            "Delete " +
-              ix.length +
-              " vault(s)?\nThe folders move to your Google Drive Trash and the contractor links stop working.",
-          )
-        )
-          return;
-        const gone = new Set();
-        await Promise.all(
-          ix.map(async (i) => {
-            const v = vaults[i];
-            try {
-              await api({ action: "delete", id: vid(v) });
-              gone.add(v.link);
-            } catch (e) {
-              if (/expired|Invalid vault/i.test(e.message)) gone.add(v.link);
-              else toast("Could not delete " + v.name);
-            }
-          }),
-        );
-        vaults = vaults.filter((v) => !gone.has(v.link));
-        gone.forEach((l) => sel.delete(l));
-        render();
-        if (gone.size) toast(gone.size + " vault(s) deleted ✔");
-      }
-      const dayKey = () => vaults.map((v) => daysLeft(v)).join();
-      async function reopen(i) {
-        const v = vaults[i];
-        if (
-          !v ||
-          !confirm(
-            "Reopen this order?\nThe same contractor link will work again, so more photos can be uploaded.",
-          )
-        )
-          return;
-        try {
-          await api({ action: "reopen", id: vid(v) });
-          v.submitted = false;
-          render();
-          toast("Order reopened ✔");
-        } catch (e) {
-          toast("Could not reopen: " + e.message);
-        }
-      }
-      function copyL(i) {
-        navigator.clipboard.writeText(vaults[i].link).then(
-          () => toast("Link copied ✔"),
-          () => toast("Could not copy the link."),
-        );
-      }
+<button class="ib dng" title="Delete vault" onclick="rm([${i}])">${I.t}</button></div>`).join('');
+  $('tbar').hidden=!vaults.length;$('tools').hidden=!vaults.length;
+  $('cnt').textContent=vaults.length;$('bulk').disabled=!vs.length;$('bulk').textContent='Delete selected ('+vs.length+')';
+  $('all').checked=view.length>0&&vs.length===view.length;lastKey=dayKey();expBar();}
+$('q').oninput=e=>{q=e.target.value;render();};
+$('sort').onchange=e=>{sortBy=e.target.value;render();};
+$('list').onchange=e=>{const v=vaults[e.target.dataset.i];if(!v)return;e.target.checked?sel.add(v.link):sel.delete(v.link);render();};
+$('all').onchange=e=>{shown().forEach(x=>e.target.checked?sel.add(x.v.link):sel.delete(x.v.link));render();};
+$('bulk').onclick=()=>rm(shown().filter(x=>sel.has(x.v.link)).map(x=>x.i));
+async function rm(ix){if(!ix.length||!confirm('Delete '+ix.length+' vault(s)?\nThe folders move to your Google Drive Trash and the contractor links stop working.'))return;
+  const gone=new Set();
+  await Promise.all(ix.map(async i=>{const v=vaults[i];try{await api({action:'delete',id:vid(v)});gone.add(v.link);}
+    catch(e){if(/expired|Invalid vault/i.test(e.message))gone.add(v.link);else toast('Could not delete '+v.name);}}));
+  vaults=vaults.filter(v=>!gone.has(v.link));gone.forEach(l=>sel.delete(l));render();if(gone.size)toast(gone.size+' vault(s) deleted ✔');}
+const dayKey=()=>vaults.map(v=>daysLeft(v)).join();
+async function reopen(i){const v=vaults[i];if(!v||!confirm('Reopen this order?\nThe same contractor link will work again, so more photos can be uploaded.'))return;
+  try{await api({action:'reopen',id:vid(v)});v.submitted=false;render();toast('Order reopened ✔');}catch(e){toast('Could not reopen: '+e.message);}}
+function copyL(i){navigator.clipboard.writeText(vaults[i].link).then(()=>toast('Link copied ✔'),()=>toast('Could not copy the link.'));}
 
-      /* ---------- expiry (30 days) ---------- */
-      function purge() {
-        const keep = vaults.filter((v) => left(v) > 0);
-        if (keep.length === vaults.length) return false;
-        vaults.filter((v) => left(v) <= 0).forEach((v) => sel.delete(v.link));
-        vaults = keep;
-        return true;
-      }
-      const expiring = () =>
-        vaults
-          .filter((v) => left(v) > 0 && left(v) <= WARN)
-          .sort((a, b) => left(a) - left(b));
-      function fmtLeft(ms) {
-        const m = Math.max(1, Math.ceil(ms / 6e4)),
-          d = Math.floor(m / 1440),
-          h = Math.floor((m % 1440) / 60),
-          mi = m % 60,
-          pl = (n, w) => n + " " + w + (n === 1 ? "" : "s");
-        return d
-          ? pl(d, "day") + " " + pl(h, "hr")
-          : h
-            ? pl(h, "hr") + " " + pl(mi, "min")
-            : pl(mi, "min");
-      }
-      function expBar() {
-        const l = expiring();
-        $("expBar").hidden = !l.length;
-        $("expTxt").textContent =
-          l.length +
-          (l.length === 1 ? " vault is" : " vaults are") +
-          " going to be deleted within 3 days.";
-      }
-      function showExp() {
-        const l = expiring();
-        if (!l.length) return;
-        $("xl").innerHTML = l
-          .map(
-            (v) =>
-              `<li><span class="n">${esc(v.name)}</span><span class="t">${fmtLeft(left(v))} left</span></li>`,
-          )
-          .join("");
-        openM("xm");
-      }
-      $("expView").onclick = showExp;
-      $("xok").onclick = () => closeM("xm");
-      /* ---------- sign in / server calls ---------- */
-      async function api(b) {
-        const r = await (
-          await fetch(API_URL, {
-            method: "POST",
-            body: JSON.stringify(Object.assign({ key: KEY }, b)),
-          })
-        ).json();
-        if (!r.ok) {
-          const m = String(r.error || "Request failed").replace(
-            /^Error:\s*/,
-            "",
-          );
-          if (/Wrong admin key/i.test(m) && !$("app").hidden)
-            signOut("Your admin key is no longer valid. Please sign in again.");
-          throw new Error(m);
-        }
-        return r;
-      }
-      const mkV = (x) => ({
-        id: x.id,
-        name: x.name,
-        drive: x.url,
-        created: x.created,
-        photos: x.photos || 0,
-        submitted: !!x.submitted,
-        link: new URL("vault.html?id=" + x.id, location.href).href,
-      });
-      async function signIn(key, remember, fromSaved) {
-        KEY = String(key || "").trim();
-        $("lmsg").textContent = "";
-        if (!KEY) {
-          $("lmsg").textContent = "Enter your admin key.";
-          return;
-        }
-        $("unlock").disabled = true;
-        $("unlock").textContent = "Loading…";
-        try {
-          const r = await api({ action: "list" });
-          USER = r.user;
-          vaults = r.vaults.map(mkV);
-          sel = new Set();
-          localStorage.removeItem("pvKey");
-          sessionStorage.removeItem("pvKey");
-          (remember ? localStorage : sessionStorage).pvKey = KEY;
-          $("signup").hidden = true;
-          $("login").hidden = true;
-          $("app").hidden = false;
-          $("signout").hidden = false;
-          $("signout").title = "Sign out (" + USER + ")";
-          $("co").textContent = USER;
-          $("avatar").title = USER;
-          $("key").value = "";
-          purge();
-          render();
-          showExp(); // pop-up on every sign-in if a vault expires within 3 days
-          if (!localStorage.pvTour) setTimeout(startTour, 400);
-        } catch (e) {
-          $("signup").hidden = false;
-          $("lmsg").textContent =
-            (fromSaved && !/Wrong admin key/i.test(e.message)
-              ? "Could not load your vaults: "
-              : "") + e.message;
-          KEY = "";
-          if (fromSaved && /Wrong admin key/i.test(e.message)) {
-            localStorage.removeItem("pvKey");
-            sessionStorage.removeItem("pvKey");
-          }
-        }
-        $("unlock").disabled = false;
-        $("unlock").textContent = "Load My Vaults";
-      }
-      function signOut(m) {
-        KEY = "";
-        USER = "";
-        vaults = [];
-        sel = new Set();
-        q = "";
-        $("q").value = "";
-        localStorage.removeItem("pvKey");
-        sessionStorage.removeItem("pvKey");
-        $("app").hidden = true;
-        $("signout").hidden = true;
-        $("co").textContent = "";
-        $("avatar").title = "Account";
-        $("login").hidden = false;
-        $("key").value = "";
-        $("lmsg").textContent = m || "";
-        ["cm", "em", "xm", "sg"].forEach(closeM);
-        $("signup").hidden = false;
-      }
-      $("unlock").onclick = () => signIn($("key").value, $("remember").checked);
-      $("key").onkeydown = (e) => {
-        if (e.key === "Enter") $("unlock").onclick();
-      };
-      $("signout").onclick = () => signOut("");
+/* ---------- expiry (30 days) ---------- */
+function purge(){const keep=vaults.filter(v=>left(v)>0);if(keep.length===vaults.length)return false;
+  vaults.filter(v=>left(v)<=0).forEach(v=>sel.delete(v.link));vaults=keep;return true;}
+const expiring=()=>vaults.filter(v=>left(v)>0&&left(v)<=WARN).sort((a,b)=>left(a)-left(b));
+function fmtLeft(ms){const m=Math.max(1,Math.ceil(ms/6e4)),d=Math.floor(m/1440),h=Math.floor(m%1440/60),mi=m%60,pl=(n,w)=>n+' '+w+(n===1?'':'s');
+  return d?pl(d,'day')+' '+pl(h,'hr'):h?pl(h,'hr')+' '+pl(mi,'min'):pl(mi,'min');}
+function expBar(){const l=expiring();$('expBar').hidden=!l.length;
+  $('expTxt').textContent=l.length+(l.length===1?' vault is':' vaults are')+' going to be deleted within 3 days.';}
+function showExp(){const l=expiring();if(!l.length)return;
+  $('xl').innerHTML=l.map(v=>`<li><span class="n">${esc(v.name)}</span><span class="t">${fmtLeft(left(v))} left</span></li>`).join('');openM('xm');}
+$('expView').onclick=showExp;$('xok').onclick=()=>closeM('xm');
+/* ---------- sign in / server calls ---------- */
+async function api(b){
+  const r=await(await fetch(API_URL,{method:'POST',body:JSON.stringify(Object.assign({key:KEY},b))})).json();
+  if(!r.ok){const m=String(r.error||'Request failed').replace(/^Error:\s*/,'');
+    if(/Wrong admin key/i.test(m)&&!$('app').hidden)signOut('Your admin key is no longer valid. Please sign in again.');throw new Error(m);}
+  return r;}
+const mkV=x=>({id:x.id,name:x.name,drive:x.url,created:x.created,photos:x.photos||0,submitted:!!x.submitted,link:new URL('vault.html?id='+x.id,location.href).href});
+async function signIn(key,remember,fromSaved){
+  KEY=String(key||'').trim();$('lmsg').textContent='';if(!KEY){$('lmsg').textContent='Enter your admin key.';return;}
+  $('unlock').disabled=true;$('unlock').textContent='Loading…';
+  try{const r=await api({action:'list'});USER=r.user;vaults=r.vaults.map(mkV);sel=new Set();
+    localStorage.removeItem('pvKey');sessionStorage.removeItem('pvKey');(remember?localStorage:sessionStorage).pvKey=KEY;
+    $('signup').hidden=true;$('how').hidden=true;$('login').hidden=true;$('app').hidden=false;$('signout').hidden=false;$('signout').title='Sign out ('+USER+')';$('co').textContent=USER;$('avatar').title=USER;$('key').value='';
+    purge();render();showExp();   // pop-up on every sign-in if a vault expires within 3 days
+    if(!localStorage.pvTour)setTimeout(startTour,400);
+  }catch(e){$('signup').hidden=false;$('how').hidden=false;$('lmsg').textContent=(fromSaved&&!/Wrong admin key/i.test(e.message)?'Could not load your vaults: ':'')+e.message;KEY='';
+    if(fromSaved&&/Wrong admin key/i.test(e.message)){localStorage.removeItem('pvKey');sessionStorage.removeItem('pvKey');}}
+  $('unlock').disabled=false;$('unlock').textContent='Load My Vaults';}
+function signOut(m){KEY='';USER='';vaults=[];sel=new Set();q='';$('q').value='';localStorage.removeItem('pvKey');sessionStorage.removeItem('pvKey');
+  $('app').hidden=true;$('signout').hidden=true;$('co').textContent='';$('avatar').title='Account';$('login').hidden=false;$('how').hidden=false;$('key').value='';$('lmsg').textContent=m||'';
+  ['cm','em','xm','sg'].forEach(closeM);$('signup').hidden=false;}
+$('unlock').onclick=()=>signIn($('key').value,$('remember').checked);
+$('key').onkeydown=e=>{if(e.key==='Enter')$('unlock').onclick();};
+$('signout').onclick=()=>signOut('');
 
-      /* ---------- sign up ---------- */
-      const SG = {
-        name: "sgname",
-        email: "sgemail",
-        cemail: "sgcemail",
-        company: "sgco",
-        phone: "sgphone",
-        whatsapp: "sgwa",
-        address: "sgaddr",
-      };
-      const okMail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),
-        okTel = (v) => {
-          const n = v.replace(/\D/g, "").length;
-          return n >= 7 && n <= 15 && /^[+\d\s()\-]+$/.test(v);
-        };
-      $("signup").onclick = () => {
-        Object.values(SG).forEach((id) => ($(id).value = ""));
-        $("sgweb").value = "";
-        $("sgmsg").textContent = "";
-        $("sgForm").hidden = false;
-        $("sgDone").hidden = true;
-        $("sgsend").disabled = false;
-        openM("sg");
-        $("sgname").focus();
-      };
-      $("sgx").onclick = () => closeM("sg");
-      $("sgok").onclick = () => closeM("sg");
-      $("sgsend").onclick = async () => {
-        const f = {};
-        Object.entries(SG).forEach(([k, id]) => (f[k] = $(id).value.trim()));
-        f.website = $("sgweb").value;
-        if (
-          Object.values(f)
-            .slice(0, 7)
-            .some((v) => !v)
-        ) {
-          $("sgmsg").textContent = "Please fill in all fields.";
-          return;
-        }
-        if (!okMail(f.email) || !okMail(f.cemail)) {
-          $("sgmsg").textContent = "Please enter valid email addresses.";
-          return;
-        }
-        if (!okTel(f.phone) || !okTel(f.whatsapp)) {
-          $("sgmsg").textContent =
-            "Please enter valid phone numbers (digits, + and - only).";
-          return;
-        }
-        $("sgsend").disabled = true;
-        $("sgmsg").textContent = "Sending…";
-        try {
-          const r = await (
-            await fetch(API_URL, {
-              method: "POST",
-              body: JSON.stringify({ action: "signup", form: f }),
-            })
-          ).json();
-          if (!r.ok)
-            throw new Error(
-              String(r.error || "Request failed").replace(/^Error:\s*/, ""),
-            );
-          $("sgmsg").textContent = "";
-          $("sgForm").hidden = true;
-          $("sgDone").hidden = false;
-        } catch (e) {
-          $("sgmsg").textContent = "Error: " + e.message;
-          $("sgsend").disabled = false;
-        }
-      };
+/* ---------- sign up ---------- */
+const SG={name:'sgname',email:'sgemail',cemail:'sgcemail',company:'sgco',phone:'sgphone',whatsapp:'sgwa',address:'sgaddr'};
+const okMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),okTel=v=>{const n=v.replace(/\D/g,'').length;return n>=7&&n<=15&&/^[+\d\s()\-]+$/.test(v);};
+$('signup').onclick=()=>{Object.values(SG).forEach(id=>$(id).value='');$('sgweb').value='';$('sgmsg').textContent='';$('sgForm').hidden=false;$('sgDone').hidden=true;$('sgsend').disabled=false;openM('sg');$('sgname').focus();};
+$('sgx').onclick=()=>closeM('sg');$('sgok').onclick=()=>closeM('sg');
+$('sgsend').onclick=async()=>{
+  const f={};Object.entries(SG).forEach(([k,id])=>f[k]=$(id).value.trim());f.website=$('sgweb').value;
+  if(Object.values(f).slice(0,7).some(v=>!v)){$('sgmsg').textContent='Please fill in all fields.';return;}
+  if(!okMail(f.email)||!okMail(f.cemail)){$('sgmsg').textContent='Please enter valid email addresses.';return;}
+  if(!okTel(f.phone)||!okTel(f.whatsapp)){$('sgmsg').textContent='Please enter valid phone numbers (digits, + and - only).';return;}
+  $('sgsend').disabled=true;$('sgmsg').textContent='Sending…';
+  try{const r=await(await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'signup',form:f})})).json();
+    if(!r.ok)throw new Error(String(r.error||'Request failed').replace(/^Error:\s*/,''));
+    $('sgmsg').textContent='';$('sgForm').hidden=true;$('sgDone').hidden=false;
+  }catch(e){$('sgmsg').textContent='Error: '+e.message;$('sgsend').disabled=false;}};
 
-      /* ---------- create ---------- */
-      $("go").onclick = async () => {
-        const parts = getParts($("ins"));
-        const o = {
-          wo: $("wo").value.trim(),
-          type: $("type").value.trim(),
-          contractor: $("contractor").value.trim(),
-          phone: fmtPhone($("phone").value),
-          address: $("address").value.trim(),
-          due: $("due").value.trim(),
-          lock: $("lock").value.trim(),
-          code: $("code").value.trim(),
-          instr: joinIns(parts),
-          instrs: parts,
-          pay: $("pay").value.trim(),
-        };
-        if (!o.wo || !o.address) {
-          $("msg").textContent = "Work order number and address are required.";
-          return;
-        }
-        if (o.due && !validDate(o.due)) {
-          $("msg").textContent = "Enter the due date as mm/dd/yyyy.";
-          return;
-        }
-        $("go").disabled = true;
-        $("msg").textContent = "Creating…";
-        try {
-          const r = await api({ action: "create", order: o });
-          vaults.unshift(
-            mkV({
-              id: r.id,
-              name: r.name,
-              url: r.url,
-              created: r.created || Date.now(),
-            }),
-          );
-          render();
-          [
-            "wo",
-            "type",
-            "due",
-            "address",
-            "contractor",
-            "phone",
-            "lock",
-            "code",
-            "pay",
-          ].forEach((k) => ($(k).value = ""));
-          $("ins").innerHTML = "";
-          addIns($("ins"));
-          $("msg").textContent = "";
-          closeM("cm");
-          toast("Vault created ✔");
-        } catch (e) {
-          $("msg").textContent = "Error: " + e.message;
-        }
-        $("go").disabled = false;
-      };
+/* ---------- create ---------- */
+$('go').onclick=async()=>{
+  const parts=getParts($('ins'));
+  const o={wo:$('wo').value.trim(),type:$('type').value.trim(),contractor:$('contractor').value.trim(),phone:fmtPhone($('phone').value),address:$('address').value.trim(),due:$('due').value.trim(),lock:$('lock').value.trim(),code:$('code').value.trim(),instr:joinIns(parts),instrs:parts,pay:$('pay').value.trim()};
+  if(!o.wo||!o.address){$('msg').textContent='Work order number and address are required.';return;}
+  if(o.due&&!validDate(o.due)){$('msg').textContent='Enter the due date as mm/dd/yyyy.';return;}
+  $('go').disabled=true;$('msg').textContent='Creating…';
+  try{const r=await api({action:'create',order:o});
+    vaults.unshift(mkV({id:r.id,name:r.name,url:r.url,created:r.created||Date.now()}));
+    render();
+    ['wo','type','due','address','contractor','phone','lock','code','pay'].forEach(k=>$(k).value='');
+    $('ins').innerHTML='';addIns($('ins'));$('msg').textContent='';closeM('cm');toast('Vault created ✔');
+  }catch(e){$('msg').textContent='Error: '+e.message;}
+  $('go').disabled=false;};
 
-      /* ---------- edit vault ---------- */
-      const EF = {
-        due: "edue",
-        contractor: "econtractor",
-        lock: "elock",
-        code: "ecode",
-        pay: "epay",
-      };
-      $("edue").oninput = (e) => {
-        e.target.value = fmtDate(e.target.value);
-      };
-      async function openEdit(i) {
-        editIdx = i;
-        const v = vaults[i];
-        $("emname").textContent = v.name;
-        Object.values(EF).forEach((id) => ($(id).value = ""));
-        $("eins").innerHTML = "";
-        addIns($("eins"));
-        $("emsg").textContent = "Loading…";
-        $("esave").disabled = true;
-        openM("em");
-        try {
-          const r = await (
-            await fetch(API_URL + "?id=" + encodeURIComponent(vid(v)))
-          ).json();
-          if (!r.ok) throw new Error(r.error);
-          const o = r.order;
-          Object.entries(EF).forEach(([k, id]) => ($(id).value = o[k] || ""));
-          let ins =
-            Array.isArray(o.instrs) && o.instrs.length
-              ? o.instrs
-              : o.instr
-                ? [o.instr]
-                : [];
-          if (ins.length === 1 && /\n\n(?=\d+\. )/.test(ins[0]))
-            ins = ins[0]
-              .split(/\n\n(?=\d+\. )/)
-              .map((t) => t.replace(/^\d+\.\s/, ""));
-          $("eins").innerHTML = "";
-          (ins.length ? ins : [""]).forEach((t) => addIns($("eins"), t));
-          $("emsg").textContent = "";
-          $("esave").disabled = false;
-        } catch (e) {
-          $("emsg").textContent = "Could not load this vault: " + e.message;
-        }
-      }
-      $("esave").onclick = async () => {
-        const parts = getParts($("eins")),
-          fields = {};
-        Object.entries(EF).forEach(
-          ([k, id]) => (fields[k] = $(id).value.trim()),
-        );
-        if (fields.due && !validDate(fields.due)) {
-          $("emsg").textContent = "Enter the due date as mm/dd/yyyy.";
-          return;
-        }
-        $("esave").disabled = true;
-        $("emsg").textContent = "Saving…";
-        try {
-          await api({
-            action: "update",
-            id: vid(vaults[editIdx]),
-            fields,
-            instrs: parts,
-            instr: joinIns(parts),
-          });
-          $("emsg").textContent = "";
-          closeM("em");
-          toast("Vault updated ✔");
-        } catch (e) {
-          $("emsg").textContent = "Error: " + e.message;
-        }
-        $("esave").disabled = false;
-      };
+/* ---------- edit vault ---------- */
+const EF={due:'edue',contractor:'econtractor',lock:'elock',code:'ecode',pay:'epay'};
+$('edue').oninput=e=>{e.target.value=fmtDate(e.target.value);};
+async function openEdit(i){
+  editIdx=i;const v=vaults[i];$('emname').textContent=v.name;
+  Object.values(EF).forEach(id=>$(id).value='');
+  $('eins').innerHTML='';addIns($('eins'));$('emsg').textContent='Loading…';$('esave').disabled=true;openM('em');
+  try{const r=await(await fetch(API_URL+'?id='+encodeURIComponent(vid(v)))).json();if(!r.ok)throw new Error(r.error);
+    const o=r.order;Object.entries(EF).forEach(([k,id])=>$(id).value=o[k]||'');
+    let ins=Array.isArray(o.instrs)&&o.instrs.length?o.instrs:(o.instr?[o.instr]:[]);
+    if(ins.length===1&&/\n\n(?=\d+\. )/.test(ins[0]))ins=ins[0].split(/\n\n(?=\d+\. )/).map(t=>t.replace(/^\d+\.\s/,''));
+    $('eins').innerHTML='';(ins.length?ins:['']).forEach(t=>addIns($('eins'),t));
+    $('emsg').textContent='';$('esave').disabled=false;
+  }catch(e){$('emsg').textContent='Could not load this vault: '+e.message;}}
+$('esave').onclick=async()=>{
+  const parts=getParts($('eins')),fields={};Object.entries(EF).forEach(([k,id])=>fields[k]=$(id).value.trim());
+  if(fields.due&&!validDate(fields.due)){$('emsg').textContent='Enter the due date as mm/dd/yyyy.';return;}
+  $('esave').disabled=true;$('emsg').textContent='Saving…';
+  try{await api({action:'update',id:vid(vaults[editIdx]),fields,instrs:parts,instr:joinIns(parts)});
+    $('emsg').textContent='';closeM('em');toast('Vault updated ✔');
+  }catch(e){$('emsg').textContent='Error: '+e.message;}
+  $('esave').disabled=false;};
 
-      /* ---------- tutorial ---------- */
-      const STEPS = [
-        {
-          t: "Welcome to PhotoSol",
-          b: "This short tour shows how to create a photo vault, share it with a contractor and manage it. Use Next to continue, or Skip to leave at any time.",
-        },
-        {
-          el: "#openCreate",
-          t: "Start a new vault",
-          b: 'Each work order gets its own vault. Click "+ Create A Vault" to open the form.',
-        },
-        {
-          el: "#fg",
-          modal: 1,
-          t: "Fill in the order details",
-          b: "Enter the Work Order Number and the Property Address (those two are required). Everything else is optional. Dates use mm/dd/yyyy and phone numbers format themselves as (000)-000-0000.",
-        },
-        {
-          el: "#insWrap",
-          modal: 1,
-          t: "Add instructions",
-          b: 'Type the work order instructions the contractor must follow. Use "+ Add Another Instruction" to add more; they are numbered automatically.',
-        },
-        {
-          el: "#go",
-          modal: 1,
-          t: "Create the vault",
-          b: 'Click "Create Photo Vault". A folder is created in Google Drive and the vault appears in your list.',
-        },
-        {
-          el: "#vaultCard",
-          t: "Your vaults",
-          b: "All your vaults are listed here with their created date, valid-till date and live photo count. A green tick appears when the contractor submits the order (their link is then suspended; use the reopen button to turn it back on). A yellow warning shows 10 days before a vault is deleted. Tick the boxes to select several and delete them at once. The list loads from the server with your admin key, so you see the same vaults on any device. Vaults are deleted automatically 30 days after creation.",
-        },
-        {
-          el: "#tools",
-          row: 1,
-          t: "Search and sort",
-          b: "Type to search instantly by work order, address or date. Use the menu to sort by created date, newest or oldest first.",
-        },
-        {
-          el: "#list .ed",
-          row: 1,
-          t: "Edit a vault",
-          b: "Click the pencil to change the due date, contractor, lockbox, key code, payment or instructions. The contractor sees the changes the next time they open their link.",
-        },
-        {
-          el: "#list .dr",
-          row: 1,
-          t: "Open Google Drive",
-          b: "Opens the vault's folder in Google Drive, where all uploaded photos are saved.",
-        },
-        {
-          el: "#list .cp",
-          row: 1,
-          t: "Copy the vault link",
-          b: "Copy the link and send it to the contractor by text or email. It is all they need.",
-        },
-        {
-          el: "#list .dng",
-          row: 1,
-          t: "Delete a vault",
-          b: "Moves the vault folder to your Google Drive Trash and stops the contractor link from working. You can restore it from the Trash.",
-        },
-        {
-          t: "What the contractor does",
-          b: 'They open the link, review the order, then take photos with the camera or upload from their gallery (location is required for camera photos). After uploading, they tap Submit Order, and you get an email: "Order is complete".',
-        },
-        {
-          el: "#help",
-          t: "You're all set",
-          b: "Tap this ? button any time to replay the tour.",
-        },
-      ];
-      let TS = [],
-        ti = 0,
-        tourOpen = false;
-      function startTour() {
-        if ($("app").hidden) {
-          toast("Sign in first.");
-          return;
-        }
-        TS = STEPS.filter((s) => !s.row || vaults.length);
-        ti = 0;
-        tourOpen = true;
-        $("tour").hidden = false;
-        showStep();
-      }
-      function endTour() {
-        tourOpen = false;
-        $("tour").hidden = true;
-        closeM("cm");
-        localStorage.pvTour = "1";
-      }
-      function showStep() {
-        const s = TS[ti];
-        if (s.modal) {
-          if ($("cm").hidden) openM("cm");
-        } else if (!$("cm").hidden) closeM("cm");
-        $("tpN").textContent = "Step " + (ti + 1) + " of " + TS.length;
-        $("tpT").textContent = s.t;
-        $("tpB").textContent = s.b;
-        $("tpDots").innerHTML = TS.map(
-          (_, i) => `<i class="${i <= ti ? "on" : ""}"></i>`,
-        ).join("");
-        $("tpBack").hidden = ti === 0;
-        $("tpNext").textContent = ti === TS.length - 1 ? "Done" : "Next";
-        const el = s.el && document.querySelector(s.el);
-        if (el) el.scrollIntoView({ block: "center" });
-        place();
-        setTimeout(place, 80);
-      }
-      function place() {
-        if (!tourOpen) return;
-        const s = TS[ti],
-          el = s.el && document.querySelector(s.el),
-          hl = $("tourHL"),
-          p = $("tourPop");
-        const pw = p.offsetWidth,
-          ph = p.offsetHeight,
-          vw = innerWidth,
-          vh = innerHeight;
-        if (!el) {
-          Object.assign(hl.style, {
-            left: vw / 2 + "px",
-            top: vh / 2 + "px",
-            width: "0px",
-            height: "0px",
-          });
-          p.style.left = Math.max(12, (vw - pw) / 2) + "px";
-          p.style.top = Math.max(12, (vh - ph) / 2) + "px";
-          return;
-        }
-        const r = el.getBoundingClientRect(),
-          g = 6;
-        Object.assign(hl.style, {
-          left: r.left - g + "px",
-          top: r.top - g + "px",
-          width: r.width + 2 * g + "px",
-          height: r.height + 2 * g + "px",
-        });
-        let top = r.bottom + g + 12;
-        if (top + ph > vh - 12) {
-          top = r.top - g - 12 - ph;
-          if (top < 12) top = vh - ph - 12;
-        }
-        p.style.top = Math.max(12, top) + "px";
-        p.style.left = Math.min(Math.max(12, r.left), vw - pw - 12) + "px";
-      }
-      addEventListener("resize", place);
-      addEventListener("scroll", place, true);
-      $("tpNext").onclick = () => {
-        ti < TS.length - 1 ? (ti++, showStep()) : endTour();
-      };
-      $("tpBack").onclick = () => {
-        if (ti > 0) {
-          ti--;
-          showStep();
-        }
-      };
-      $("tpSkip").onclick = endTour;
-      $("help").onclick = startTour;
+/* ---------- tutorial ---------- */
+const STEPS=[
+{t:'Welcome to PhotoSol',b:'This short tour shows how to create a photo vault, share it with a contractor and manage it. Use Next to continue, or Skip to leave at any time.'},
+{el:'#openCreate',t:'Start a new vault',b:'Each work order gets its own vault. Click "+ Create A Vault" to open the form.'},
+{el:'#fg',modal:1,t:'Fill in the order details',b:'Enter the Work Order Number and the Property Address (those two are required). Everything else is optional. Dates use mm/dd/yyyy and phone numbers format themselves as (000)-000-0000.'},
+{el:'#insWrap',modal:1,t:'Add instructions',b:'Type the work order instructions the contractor must follow. Use "+ Add Another Instruction" to add more; they are numbered automatically.'},
+{el:'#go',modal:1,t:'Create the vault',b:'Click "Create Photo Vault". A folder is created in Google Drive and the vault appears in your list.'},
+{el:'#vaultCard',t:'Your vaults',b:'All your vaults are listed here with their created date, valid-till date and live photo count. A green tick appears when the contractor submits the order (their link is then suspended; use the reopen button to turn it back on). A yellow warning shows 10 days before a vault is deleted. Tick the boxes to select several and delete them at once. The list loads from the server with your admin key, so you see the same vaults on any device. Vaults are deleted automatically 30 days after creation.'},
+{el:'#tools',row:1,t:'Search and sort',b:'Type to search instantly by work order, address or date. Use the menu to sort by created date, newest or oldest first.'},
+{el:'#list .ed',row:1,t:'Edit a vault',b:'Click the pencil to change the due date, contractor, lockbox, key code, payment or instructions. The contractor sees the changes the next time they open their link.'},
+{el:'#list .dr',row:1,t:'Open Google Drive',b:'Opens the vault\'s folder in Google Drive, where all uploaded photos are saved.'},
+{el:'#list .cp',row:1,t:'Copy the vault link',b:'Copy the link and send it to the contractor by text or email. It is all they need.'},
+{el:'#list .dng',row:1,t:'Delete a vault',b:'Moves the vault folder to your Google Drive Trash and stops the contractor link from working. You can restore it from the Trash.'},
+{t:'What the contractor does',b:'They open the link, review the order, then take photos with the camera or upload from their gallery (location is required for camera photos). After uploading, they tap Submit Order, and you get an email: "Order is complete".'},
+{el:'#help',t:'You\'re all set',b:'Tap this ? button any time to replay the tour.'}];
+let TS=[],ti=0,tourOpen=false;
+function startTour(){if($('app').hidden){toast('Sign in first.');return;}TS=STEPS.filter(s=>!s.row||vaults.length);ti=0;tourOpen=true;$('tour').hidden=false;showStep();}
+function endTour(){tourOpen=false;$('tour').hidden=true;closeM('cm');localStorage.pvTour='1';}
+function showStep(){const s=TS[ti];
+  if(s.modal){if($('cm').hidden)openM('cm');}else if(!$('cm').hidden)closeM('cm');
+  $('tpN').textContent='Step '+(ti+1)+' of '+TS.length;$('tpT').textContent=s.t;$('tpB').textContent=s.b;
+  $('tpDots').innerHTML=TS.map((_,i)=>`<i class="${i<=ti?'on':''}"></i>`).join('');
+  $('tpBack').hidden=ti===0;$('tpNext').textContent=ti===TS.length-1?'Done':'Next';
+  const el=s.el&&document.querySelector(s.el);if(el)el.scrollIntoView({block:'center'});
+  place();setTimeout(place,80);}
+function place(){if(!tourOpen)return;const s=TS[ti],el=s.el&&document.querySelector(s.el),hl=$('tourHL'),p=$('tourPop');
+  const pw=p.offsetWidth,ph=p.offsetHeight,vw=innerWidth,vh=innerHeight;
+  if(!el){Object.assign(hl.style,{left:vw/2+'px',top:vh/2+'px',width:'0px',height:'0px'});p.style.left=Math.max(12,(vw-pw)/2)+'px';p.style.top=Math.max(12,(vh-ph)/2)+'px';return;}
+  const r=el.getBoundingClientRect(),g=6;
+  Object.assign(hl.style,{left:r.left-g+'px',top:r.top-g+'px',width:r.width+2*g+'px',height:r.height+2*g+'px'});
+  let top=r.bottom+g+12;if(top+ph>vh-12){top=r.top-g-12-ph;if(top<12)top=vh-ph-12;}
+  p.style.top=Math.max(12,top)+'px';p.style.left=Math.min(Math.max(12,r.left),vw-pw-12)+'px';}
+addEventListener('resize',place);addEventListener('scroll',place,true);
+$('tpNext').onclick=()=>{ti<TS.length-1?(ti++,showStep()):endTour();};
+$('tpBack').onclick=()=>{if(ti>0){ti--;showStep();}};
+$('tpSkip').onclick=endTour;$('help').onclick=startTour;
 
-      $("signup").hidden = !!KEY;
-      render();
-      if (KEY) signIn(KEY, !!localStorage.pvKey, true);
-      setInterval(() => {
-        if (purge() || dayKey() !== lastKey) render();
-        else expBar();
-      }, 60000);
+$('signup').hidden=!!KEY;$('how').hidden=!!KEY;render();
+if(KEY)signIn(KEY,!!localStorage.pvKey,true);
+setInterval(()=>{if(purge()||dayKey()!==lastKey)render();else expBar();},60000);
 
-      /* ---------- live updates (photo count + submitted status) ---------- */
-      let polling = false;
-      async function poll() {
-        if (
-          polling ||
-          !KEY ||
-          $("app").hidden ||
-          document.hidden ||
-          !vaults.length
-        )
-          return;
-        polling = true;
-        try {
-          const r = await api({
-            action: "status",
-            ids: vaults.map((v) => v.id),
-          });
-          let ch = false;
-          vaults.forEach((v) => {
-            const s = r.status && r.status[v.id];
-            if (!s) return;
-            if (s.photos !== v.photos || s.submitted !== v.submitted) {
-              if (s.submitted && !v.submitted)
-                toast("Order " + v.name.split(" - ")[0] + " was submitted ✔");
-              v.photos = s.photos;
-              v.submitted = s.submitted;
-              ch = true;
-            }
-          });
-          if (ch) render();
-        } catch (e) {}
-        polling = false;
-      }
-      setInterval(poll, 5000);
-      document.addEventListener("visibilitychange", async () => {
-        if (document.hidden || !KEY || $("app").hidden) return;
-        if (["cm", "em", "xm"].some((id) => !$(id).hidden) || tourOpen) {
-          poll();
-          return;
-        }
-        try {
-          const r = await api({ action: "list" });
-          vaults = r.vaults.map(mkV);
-          const ids = new Set(vaults.map((v) => v.link));
-          sel = new Set([...sel].filter((l) => ids.has(l)));
-          purge();
-          render();
-        } catch (e) {}
-      });
-    </script>
-  </body>
-</html>
+/* ---------- live updates (photo count + submitted status) ---------- */
+let polling=false;
+async function poll(){if(polling||!KEY||$('app').hidden||document.hidden||!vaults.length)return;polling=true;
+  try{const r=await api({action:'status',ids:vaults.map(v=>v.id)});let ch=false;
+    vaults.forEach(v=>{const s=r.status&&r.status[v.id];if(!s)return;
+      if(s.photos!==v.photos||s.submitted!==v.submitted){
+        if(s.submitted&&!v.submitted)toast('Order '+v.name.split(' - ')[0]+' was submitted ✔');
+        v.photos=s.photos;v.submitted=s.submitted;ch=true;}});
+    if(ch)render();}catch(e){}
+  polling=false;}
+setInterval(poll,5000);
+document.addEventListener('visibilitychange',async()=>{if(document.hidden||!KEY||$('app').hidden)return;
+  if(['cm','em','xm'].some(id=>!$(id).hidden)||tourOpen){poll();return;}
+  try{const r=await api({action:'list'});vaults=r.vaults.map(mkV);const ids=new Set(vaults.map(v=>v.link));sel=new Set([...sel].filter(l=>ids.has(l)));purge();render();}catch(e){}});
+</script></body></html>
