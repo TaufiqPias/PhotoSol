@@ -3,7 +3,7 @@
 // Format:  "secret key": { name: "User name", email: "where 'Order is complete' emails go" }
 // Two keys with the same name share the same vaults (the first email found for that name is used).
 const ADMIN_KEYS = {
-  6039: { name: "Taufiq", email: "taufiq.xenox@gmail.com" },
+  6039: { name: "WolfSoft Devs", email: "taufiq.xenox@gmail.com" },
   4815: {
     name: "Kingson Transport LLC",
     email: "robertp@kingsontransport.com",
@@ -13,8 +13,8 @@ const ADMIN_KEYS = {
 };
 const LEGACY_OWNER = "Taufiq"; // vaults created before multi-user support belong to this user
 const NOTIFY_EMAIL = ""; // fallback if a user has no email above. Leave '' to use your own Google account
-const SIGNUP_EMAIL = "taufiq.xenox@gmail.com"; // sign-up requests are emailed here
-const ROOT_NAME = "PhotoSol Vault"; // parent folder in your Drive
+const SIGNUP_EMAIL = "photosol.wolfsoft@gmail.com"; // sign-up requests are emailed here
+const ROOT_NAME = "PhotoSol Vaults"; // parent folder in your Drive
 const VAULT_DAYS = 30; // vaults are moved to the Drive Trash this many days after creation
 const DAY_MS = 24 * 60 * 60 * 1000;
 
