@@ -26,7 +26,7 @@
 button.ib{width:30px;height:30px;margin:0;padding:0;flex:none;background:transparent;color:var(--mut);border:1px solid var(--bd);border-radius:50%;font-size:13px}
 #pl{margin-top:10px}#more{margin-top:6px;padding:9px;font-size:.9rem}
 </style></head><body><div class="wrap">
-<header class="top"><div class="logo">Photo<span>Sol</span></div><div class="co">Kingson Transport LLC</div></header>
+<header class="top"><div class="logo">Photo<span>Sol</span></div><div class="co" id="co"></div></header>
 <div class="card" id="info">Loading…</div>
 <div class="card" id="act" hidden>
 <div class="row" id="cr"><button id="cam">Take Photos</button><button id="up" class="sec">Upload Photos</button></div>
@@ -41,6 +41,7 @@ button.ib{width:30px;height:30px;margin:0;padding:0;flex:none;background:transpa
 <span id="cvn">0 taken</span><button id="flash" aria-label="Flash" hidden><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg></button><button id="shut" aria-label="Take photo"></button><button id="cvdone">Done</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="config.js"></script><script>
+let OWNER='';
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmtD=s=>{s=String(s||'').trim();const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[2]}/${m[3]}/${m[1]}`:s;};
 const fmtP=s=>{let d=String(s||'').replace(/\D/g,'');if(d.length===11&&d[0]==='1')d=d.slice(1);return d.length===10?`(${d.slice(0,3)})-${d.slice(3,6)}-${d.slice(6)}`:String(s||'');};
@@ -48,7 +49,7 @@ const id=new URLSearchParams(location.search).get('id');
 let items=[],seq=0,vis=5,busy=false,ORD=null,INS=[],when='';
 const post=b=>fetch(API_URL,{method:'POST',body:JSON.stringify({id,...b})}).then(r=>r.json());
 (async()=>{try{
-  const r=await(await fetch(API_URL+'?id='+encodeURIComponent(id))).json();if(!r.ok)throw r.error||0;if(r.submitted)throw 'SUBMITTED';const o=r.order;
+  const r=await(await fetch(API_URL+'?id='+encodeURIComponent(id))).json();if(!r.ok)throw r.error||0;OWNER=r.owner||'';$('co').textContent=OWNER;if(r.submitted)throw 'SUBMITTED';const o=r.order;
   const kv=(k,v)=>v?`<div class="kv"><span>${k}</span><span>${esc(v)}</span></div>`:'';
   let ins=Array.isArray(o.instrs)&&o.instrs.length?o.instrs:(o.instr?[o.instr]:[]);
   if(ins.length===1&&/\n\n(?=\d+\. )/.test(ins[0]))ins=ins[0].split(/\n\n(?=\d+\. )/).map(t=>t.replace(/^\d+\.\s/,''));
@@ -164,7 +165,7 @@ function buildReceipt(J,o,ins,th,when){
   const chk=n=>{if(y+n>H-M){doc.addPage();y=M+4;}};
   doc.setFont('helvetica','bold');doc.setFontSize(24);doc.setTextColor(26,34,48);doc.text('Photo',M,y);
   const pw=doc.getTextWidth('Photo');doc.setFont('helvetica','normal');doc.setTextColor(29,111,224);doc.text('Sol',M+pw,y);
-  doc.setFontSize(12);doc.setTextColor(90,100,115);doc.text('Kingson Transport LLC',W-M,y,{align:'right'});
+  doc.setFontSize(12);doc.setTextColor(90,100,115);doc.text(OWNER,W-M,y,{align:'right'});
   y+=5;doc.setDrawColor(200);doc.line(M,y,W-M,y);y+=10;
   doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(26,34,48);doc.text('Work Order Receipt',M,y);
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(110);doc.text('Submitted: '+when,W-M,y,{align:'right'});y+=9;
